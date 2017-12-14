@@ -25,14 +25,15 @@ def GetMostSimilarDBPediaType(test_column,unique_types,model,DEBUG):
 				similarity_scores[j,i] = model.n_similarity(test_column[j],unique_types[i])	
 				#print("DEBUG::similarity score: %f"%similarity_scores[j,i])
 			except Exception as e:
-				if unique_types[i] not in exception_list:
-					exception_list.append(unique_types[i])
-					print("DEBUG::SIMILARITY COMPUTATION EXCEPTION!!")
-					print(e)
-					print("DEBUG::type:")
-					print(unique_types[i])
-					# print("DEBUG::entity:")
-					# print(test_column[j])
+				if e not in exception_list:
+					exception_list.append(e)
+					if(DEBUG):
+						print("DEBUG::SIMILARITY COMPUTATION EXCEPTION!!")
+						print(e)
+						print("DEBUG::type:")
+						print(unique_types[i])
+						# print("DEBUG::entity:")
+						# print(test_column[j])
 	if(DEBUG):
 		print("DEBUG::the required distance measure is:")
 		print(similarity_scores)
@@ -64,17 +65,17 @@ def GetMostSimilarDBPediaType(test_column,unique_types,model,DEBUG):
 		print("DEBUG::frequencies of unique elements:")
 		print(collections.Counter(most_similar_types_list))
 
-	return most_similar_types_list, most_similar_scores, collections.Counter(most_similar_types_list)
+	return most_similar_types_list, most_similar_scores, collections.Counter(most_similar_types_list), exception_list
 
 #### EXAMPLE SCRIPT SHOWING HOW THE FUNCTION CAN BE USED...
 
 ## SET SOME MACRO PARAMETERS HERE
 HEADER = False # use the header for classification, rather than some column
 DEBUG = False # print debug information (warning -> very verbose!!) 
-STRING_NORMALIZATION = 'LOWER' # normalize test strings to a) CAPS - all caps
-				# b) LOWER - all lower case c) PROPER - capitalize first letter
+STRING_NORMALIZATION = 'NONE' # normalize test strings to a) CAPS - all caps
+				# b) LOWER - all lower case c) PROPER - capitalize first letter d) NONE - don't do anything
 MAX_CELLS = 50 # however many top rows to look at
-test_key = 'Player' # make sure header exists (should be a list of strings if several words)
+test_key = 'Position' # make sure header exists (should be a list of strings if several words)
 test_file_name = '185_baseball'
 
 # Load the 2015 wiki2vec word2vec model
@@ -103,8 +104,6 @@ if(DEBUG):
 	print(unique_types)
 
 # Load some text from a model dataset
-
-
 dataset_frame = pd.read_csv("/vectorizationdata/KnowledgeGraph2Vec/wiki2vec/darpa_data/seeds/"+test_file_name+"/"+test_file_name+"_dataset/tables/learningData.csv",header=0)
 test_column = dataset_frame[test_key].values # test column as list
 dataset_frame_headers = list(dataset_frame)
@@ -137,9 +136,12 @@ if(DEBUG):
 	print(test_column)
 
 #### BEGIN TESTING!!
-print("First, evaluate each element in test column:")
-most_similar_types_list, most_similar_scores, type_counts = GetMostSimilarDBPediaType(test_column,unique_types,model,DEBUG)
+print("First, evaluate each element/cell in test column:")
+most_similar_types_list, most_similar_scores, type_counts, exception_list = GetMostSimilarDBPediaType(test_column,unique_types,model,DEBUG)
+print("These are the various DBpedia types and their prediction frequencies:")
 print(type_counts)
+#print("These are the word exceptions encountered:")
+#print(exception_list)
 print("Second, evaluate test column cumulatively (after some filtering...):")
 test_column_merged = [] #but first, filter out trivial assertions while merging test_column into one long list
 for i in np.arange(len(test_column)):
@@ -151,6 +153,8 @@ test_column_merged.append(tmp)
 if(DEBUG):
 	print("DEBUG::these is the merged test column:")
 	print(test_column_merged)
-most_similar_types_list, similarity_scores, type_counts = GetMostSimilarDBPediaType(test_column_merged,unique_types,model,DEBUG)
+most_similar_types_list, similarity_scores, type_counts, exception_list = GetMostSimilarDBPediaType(test_column_merged,unique_types,model,DEBUG)
+print("These are the various DBpedia types and their prediction frequencies:")
 print(type_counts)
-
+#print("These are the word exceptions encountered:")
+#print(exception_list)

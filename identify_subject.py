@@ -86,82 +86,77 @@ def buildCompleteTypeSet(bestWordsMap, childParentMap):
     return allTrees
 
 
-# get best terms from model
-# NOTE: These function calls can be replaced by any calls that simply return a list of tuples
-# where the first value is the type string, and the second value is a number representing its 
-# likelihood. Right now, I'm assuming it is a count, but other metrics will work as well.
-columns = getTypeFromFile(sys.argv[1], sys.argv[2], HEADER=True)
-words = getTypeFromFile(sys.argv[1], sys.argv[2])
+def getSentenceFromKeywords(keywords, verbose=False):
+    # read in type heirarchy information
+    with open('type_heirarchy.json', 'r') as file:
+        childParentMap = json.loads(file.read())
 
-# read in type heirarchy information
-with open('type_heirarchy_parents.json', 'r') as file:
-    childParentMap = json.loads(file.read())
+    # Filter out best words from model
+    # NOTE: Hopefully this will not be needed once model is improved
+    maxCountWords = keywords[0][1]
 
-# Filter out best words from model
-# NOTE: Hopefully this will not be needed once model is improved
-maxCountColumns = columns[0][1]
-maxCountWords = words[0][1]
-
-topTenPercent = int(float(maxCountWords) * 0.5)
-bestWordsMap = {a[0]: a[1] for a in filter(lambda x: x[1] > 1, words)}
+    topTenPercent = int(float(maxCountWords) * 0.5)
+    bestWordsMap = {a[0]: a[1] for a in filter(lambda x: x[1] > 1, keywords)}
 
 
-# Create dictionary of all parent types in this dataset, as well
-# as all of the relevant children
-allTrees = buildCompleteTypeSet(bestWordsMap, childParentMap)
+    # Create dictionary of all parent types in this dataset, as well
+    # as all of the relevant children
+    allTrees = buildCompleteTypeSet(bestWordsMap, childParentMap)
 
-# 
-nodes = allTrees.keys()
-roots = set()
-leaves = set()
+    # 
+    nodes = allTrees.keys()
+    roots = set()
+    leaves = set()
 
-for treeKey in allTrees.keys():
-    for leaf in allTrees[treeKey]:
-        leaves.add(leaf)
+    for treeKey in allTrees.keys():
+        for leaf in allTrees[treeKey]:
+            leaves.add(leaf)
 
-for node in nodes:
-    if not node in leaves:
-        roots.add(node)
+    for node in nodes:
+        if not node in leaves:
+            roots.add(node)
 
-# Create tree representing all types in dataset
-tree = {}
-for root in roots:
-    tree[str(root)] = getLeaves(allTrees, root) 
+    # Create tree representing all types in dataset
+    tree = {}
+    for root in roots:
+        tree[str(root)] = getLeaves(allTrees, root) 
 
-# Create map from each type to its accumulated value
-scores = {}
-for root in roots:
-    scores.update(scoreNode(allTrees, bestWordsMap, {}, root))
-    
-# Print results prettily
-resultString = prettyPrint(tree, scores, "", "", verbose=True)
-with open('results.txt', 'w') as file:
-    file.write(resultString)
+    # Create map from each type to its accumulated value
+    scores = {}
+    for root in roots:
+        scores.update(scoreNode(allTrees, bestWordsMap, {}, root))
+        
+    # Print results prettily
+    resultString = prettyPrint(tree, scores, "", "", verbose=verbose)
+    with open('results.txt', 'w') as file:
+        file.write(resultString)
 
 
-# Largely ignore all work done above and print results from original model
+    # Largely ignore all work done above and print results from original model
 
-inf = English()
+    inf = English()
 
-print("This dataset is about ", end = '')
-addAnd = False
-for word in columns:
-    if word[1] == maxCountColumns:
-        if not addAnd:
-            addAnd = True
-            print(inf.pluralize(word[0]), end='')
-        else:
-            print(" and " + inf.pluralize(word[0]), end = '')
-print("")
+    sentence = "This dataset is about "
+    addAnd = False
+    for word in keywords:
+        if word[1] == maxCountWords:
+            if not addAnd:
+                addAnd = True
+            else:
+                sentence += " and "
+            sentence += inf.pluralize(word[0])
+    if(verbose):
+        print(sentence)
+    return(sentence)
 
-addAnd = False
-print("The column " + sys.argv[2] + " is about ", end ='')
-for word in words:
-    if word[1] == maxCountWords:
-        if not addAnd:
-            addAnd = True
-            print(inf.pluralize(word[0]), end ='')
-        else:
-            print(" and " + inf.pluralize(word[0]), end='')
-            
-print("")
+# Sample for how to use getSentenceFromKeywords
+def main(args):
+    # get best terms from model
+    # NOTE: These function calls can be replaced by any calls that simply return a list of tuples
+    # where the first value is the type string, and the second value is a number representing its 
+    # likelihood. Right now, I'm assuming it is a count, but other metrics will work as well.
+    words = getTypeFromFile(args[1], args[2])
+    sentence = getSentenceFromKeywords(words, verbose=True)
+
+if __name__ == '__main__':
+    main(sys.argv)

@@ -1,10 +1,11 @@
 from __future__ import print_function
 import sys
 import json
+import datetime
 from inflector import English
 
 # This is the import to my custom handler -- can be replaced
-from nl import getTypeFromFile
+# from nl import getTypeFromFile
 
 # Build dictionary containing the heirarchy of types. If a type has sub-types
 # in the results, then the value at htat type will be another dictionary, but if
@@ -26,8 +27,12 @@ def scoreNode(allTrees, leafScores, allScores, root_node):
         for node in allTrees[root_node]:
             if not node in allScores.keys():
                 allScores = scoreNode(allTrees, leafScores, allScores, node)
-            # Accumulation function
-            allScores[str(root_node)] = allScores[str(root_node)] + allScores[str(node)]
+        # METRIC
+        # Accumulation function
+        childScores = [allScores[str(node)] for node in allTrees[root_node]]
+        # allScores[str(root_node)] = sum(childScores) / float(len(childScores))
+        allScores[str(root_node)] = (sum(childScores) + allScores[str(root_node)]) / float(len(childScores) + 1)
+        # allScores[str(root_node)] = (sum(childScores)/float(len(childScores)) + allScores[str(root_node)]) / 2
     return allScores
 
 # Create a string which displays in a 'pretty' fashion the tree of types and 
@@ -42,8 +47,8 @@ def prettyPrint(tree, scores, prefix, resultString, verbose=False):
         currString = prefix + keyScore[0] + "(" + str(keyScore[1]) + ")"
         if(verbose):
             print(currString)
-        resultString += currString
-        prettyPrint(tree[keyScore[0]], scores, prefix + "\t", resultString, verbose)
+        resultString += currString + "\n"
+        resultString += prettyPrint(tree[keyScore[0]], scores, prefix + "\t", resultString, verbose)
 
     keyScores = [(key, scores[key]) for key in leafs]
     keyScores.sort(key=lambda x: x[1], reverse=True)
@@ -51,7 +56,7 @@ def prettyPrint(tree, scores, prefix, resultString, verbose=False):
         currString = prefix + keyScore[0] + "(" + str(keyScore[1]) + ")"
         if(verbose):
             print(currString)
-        resultString += currString
+        resultString += currString + "\n"
     return resultString
                
 
@@ -98,8 +103,9 @@ def getDominantAncestor(childParentMap, scores, node):
     parent = max([(p, scores[p]) for p in parents], key=lambda x: x[1])[0]
     nodeScore = scores[node]
     parentScore = scores[parent]
+    # METRIC
     # Metric chosen largely at random and with minimal justification
-    if(parentScore > 2*nodeScore):
+    if(parentScore > nodeScore):
         return getDominantAncestor(childParentMap, scores, parent)
     else:
         return node
@@ -113,10 +119,8 @@ def getSentenceFromKeywords(keywords, verbose=False):
 
     # Filter out best words from model
     # NOTE: Hopefully this will not be needed once model is improved
-    maxCountWords = keywords[0][1]
-
-    topTenPercent = int(float(maxCountWords) * 0.5)
-    bestWordsMap = {a[0]: a[1] for a in filter(lambda x: x[1] > 1, keywords)}
+    # bestWordsMap = {a[0]: a[1] for a in filter(lambda x: x[1] > 1, keywords)}
+    bestWordsMap = {a[0]: a[1] for a in keywords}
 
 
     # Create dictionary of all parent types in this dataset, as well
@@ -148,7 +152,8 @@ def getSentenceFromKeywords(keywords, verbose=False):
         
     # Print results prettily
     resultString = prettyPrint(tree, scores, "", "", verbose=verbose)
-    with open('results.txt', 'w+') as file:
+    filename = 'results' + str(datetime.datetime.now()) + '.txt'
+    with open(filename, 'w+') as file:
         file.write(resultString)
 
 
@@ -171,8 +176,10 @@ def main(args):
     # NOTE: These function calls can be replaced by any calls that simply return a list of tuples
     # where the first value is the type string, and the second value is a number representing its 
     # likelihood. Right now, I'm assuming it is a count, but other metrics will work as well.
-    words = getTypeFromFile(args[1], args[2])
-    sentence = getSentenceFromKeywords(words, verbose=True)
+    # words = getTypeFromFile(args[1], args[2])
+    # sentence = getSentenceFromKeywords(words, verbose=True)
+    pass
+    
 
 if __name__ == '__main__':
     main(sys.argv)

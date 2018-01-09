@@ -7,16 +7,16 @@ from similarity_functions import w2v_similarity, freq_nearest_similarity, get_ty
 def trial(headers, text, types, model, similarity_func=w2v_similarity, extra_args=None, use_headers=True, use_text=True):
 
     if use_headers and use_text:
-        in_data = np.concatenate([headers, text]) # TODO add other functions for combining headers and text
+        data = np.concatenate([headers, text]) # TODO allow equal-weighted header and text input, rather than proportional to num samples / headers
     elif use_headers:
-        in_data = headers # TODO add other functions for combining headers and text
+        data = headers # TODO add other functions for combining headers and text
     elif use_text:
-        in_data = text
+        data = text
     else: 
         raise Exception('at least one of use_headers and use_text must be true')
 
-    # types, similarities = get_type_similarities(data, types, model, similarity_func, extra_args)
-    sorted_types, similarities = timeit(get_type_similarities, [in_data, types, model, similarity_func, extra_args])
+    sorted_types, similarities = get_type_similarities(data, types, model, similarity_func, extra_args)
+    # sorted_types, similarities = timeit(get_type_similarities, [data, types, model, similarity_func, extra_args])
 
     return sorted_types, similarities
 
@@ -24,12 +24,19 @@ def trial(headers, text, types, model, similarity_func=w2v_similarity, extra_arg
 def main(
     dataset_name='185_baseball', 
     configs = [
-        {'similarity_function': w2v_similarity, 'extra_args': None},
-        {'similarity_function': freq_nearest_similarity, 'extra_args': {'n_nearest': 3}},
+        {'similarity_function': w2v_similarity},
+        {'similarity_function': freq_nearest_similarity},
+        # {'similarity_function': freq_nearest_similarity, 'extra_args': {'n_nearest': 3}},
     ]):
     
-    model = timeit(load_model)
+    print('loading model')
+    model = load_model()
+    # model = timeit(load_model)
+    
+    print('loading types')
     types = load_types(model)
+    
+    print('loading dataset')
     headers, text = load_dataset(dataset_name, model)
 
     results = {}

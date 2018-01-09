@@ -25,8 +25,7 @@ def get_type_similarities(data, types, model, similarity_func=w2v_similarity, ex
     for dat in data:
         try:
             if not np.all([d in model.wv.vocab for d in dat]):
-                # skip with logging if not in vocab (should have been prevented by normalization)
-                print('out of vocab: ', dat, [d in model.wv.vocab for d in dat])
+                print('warning, out of vocab (should have been prevented by normalization): ', dat, [d in model.wv.vocab for d in dat])
             else:
                 if extra_args:
                     similarities += similarity_func(dat, types, model, extra_args)
@@ -42,7 +41,7 @@ def get_type_similarities(data, types, model, similarity_func=w2v_similarity, ex
             raise err
 
     similarities /= max(1, n_processed)  # divide to get average 
-    print('max, min average similarities: ', np.max(similarities), ', ', np.min(similarities), '\n\n')
+    print('average similarity max, min: ', np.max(similarities), ', ', np.min(similarities), '\n\n')
 
     # sort types by average similarity and unpack lists 
     sort_indices = np.argsort(similarities)[::-1]

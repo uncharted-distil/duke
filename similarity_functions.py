@@ -13,7 +13,7 @@ def freq_nearest_similarity(words, types, model, extra_args={'n_nearest': 3}):
 
     # return indicator vector for types that are among the n_nearest most similar
     neighbors = np.zeros(len(types))
-    neighbors[sorted_inds[:n_nearest]] = 1  
+    neighbors[sorted_inds[:n_nearest]] = 1
 
     return neighbors
 
@@ -24,14 +24,11 @@ def get_type_similarities(data, types, model, similarity_func=w2v_similarity, ex
     n_processed = 0
     for dat in data:
         try:
-            if not np.all([d in model.wv.vocab for d in dat]):
-                print('warning, out of vocab (should have been prevented by normalization): ', dat, [d in model.wv.vocab for d in dat])
+            if extra_args:
+                similarities += similarity_func(dat, types, model, extra_args)
             else:
-                if extra_args:
-                    similarities += similarity_func(dat, types, model, extra_args)
-                else:
-                    similarities += similarity_func(dat, types, model) 
-                n_processed += 1
+                similarities += similarity_func(dat, types, model) 
+            n_processed += 1
                 
         except KeyError as err:
             print('error checking distance of word {0} to types (out of vocab?):'.format(dat), err)

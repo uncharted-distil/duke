@@ -16,7 +16,6 @@ def trial(headers, text, types, model, similarity_func=w2v_similarity, extra_arg
         raise Exception('at least one of use_headers and use_text must be true')
 
     sorted_types, similarities = get_type_similarities(data, types, model, similarity_func, extra_args)
-    # sorted_types, similarities = timeit(get_type_similarities, [data, types, model, similarity_func, extra_args])
 
     return sorted_types, similarities
 

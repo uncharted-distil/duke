@@ -1,128 +1,65 @@
-import re
-import time
-
 import numpy as np
-import pandas as pd
-from gensim.models import Word2Vec
+
+from utils import timeit, load_types, load_dataset, load_model, log_top_similarities
+from similarity_functions import w2v_similarity, freq_nearest_similarity, get_type_similarities
 
 
-def timeit(fn, args=None):
-    start = time.time()
-    print('calling function {0}'.format(fn.__name__))
-    result = fn(*args) if args else fn()
-    print('function {0} took {1} seconds'.format(fn.__name__, time.time() - start))
-    return result
+def trial(headers, text, types, model, similarity_func=w2v_similarity, extra_args=None, use_headers=True, use_text=True):
 
+    if use_headers and use_text:
+        in_data = np.concatenate([headers, text]) # TODO add other functions for combining headers and text
+    elif use_headers:
+        in_data = headers # TODO add other functions for combining headers and text
+    elif use_text:
+        in_data = text
+    else: 
+        raise Exception('at least one of use_headers and use_text must be true')
 
-def load_model(model_name='wiki2vec'):
-    ''' Load a word2vec model from a file in models/ '''
-    models = {
-        'wiki2vec': 'en_1000_no_stem/en.model',  # file paths hard coded here
-    }
-    start = time.time()
-    model = Word2Vec.load("models/{0}".format(models[model_name]))
-    return model
+    # types, similarities = get_type_similarities(data, types, model, similarity_func, extra_args)
+    sorted_types, similarities = timeit(get_type_similarities, [in_data, types, model, similarity_func, extra_args])
 
+    return sorted_types, similarities
 
-def flatten(lol):
-    if np.any([isinstance(el, list) for el in lol]):
-        return lol  # just return if already flat
-    else:
-        unpack = [el for sublist in lol for el in sublist]
-        return flatten(unpack)  # if there are more layers to unpack, recurse
-
-def normalize_types(types, model):
-    # create a lol of types split by capitalization
-    types = np.array([re.findall('[A-Z][^A-Z]*', typ) for typ in types])  # list of lists of single words
-    # TODO more general processing? split by spaces?
-    # remove types with out-of-vocab words
-
-    in_vocab = [np.all([word in model.wv.vocab for word in typ]) for typ in types]   
-    return types[in_vocab]
-
-
-def normalize_headers(headers, model):
-    headers = np.array([h.replace('_', ' ').lower().split(' ') for h in headers])  # list of lists of single words
-    in_vocab = [np.all([word in model.wv.vocab for word in h]) for h in headers]   
-    return headers[in_vocab]
-
-
-def normalize_text(text, model):
-    text = np.array([t.replace('_', ' ').lower().split(' ') for t in text]) # list of lists of single words
-    in_vocab = [np.all([word in model.wv.vocab for word in t]) for t in text]
-    return text[in_vocab] 
-
-
-def get_similar_types(data, types, model):
-
-    similarities = np.zeros(len(types))
-    n_processed = 0
-    for dat in data:
-        try:
-            if not np.all([d in model.wv.vocab for d in dat]):
-                # skip with logging if not in vocab (should have been prevented by normalization)
-                print('out of vocab: ', dat, [d in model.wv.vocab for d in dat])
-            else:
-                similarities += np.array([model.wv.n_similarity(dat, typ) for typ in types])
-                n_processed += 1
-        except KeyError as err:
-            print('error checking distance of word {0} to types (out of vocab?):'.format(dat), err)
-        except Exception as err:
-            print('unknown error: ', err)
-            raise err
-
-    similarities /= max(1, n_processed)  # divide to get average 
-    print('max, min similarities: ', np.max(similarities), ', ', np.min(similarities), '\n\n')
-
-    # sort types by average similarity and unpack lists 
-    sort_indices = np.argsort(similarities)[::-1]
-    sorted_types = np.array(types)[sort_indices]
-    sorted_similarities = similarities[sort_indices]
-
-    return sorted_types, sorted_similarities
-
-
-def load_dataset(dataset_name, model):
-    csv_path = 'data/{0}/{0}_dataset/tables/learningData.csv'.format(dataset_name)
-    full_df = pd.read_csv(csv_path, header=0)  # read csv assuming first line has header text
-    text_df = full_df.select_dtypes(['object'])  # drop non-text rows (pandas strings are of type 'object')
-    # TODO confirm that the columns selected can't be cast to a numeric type to avoid numeric strings (e.g. '1')
+# config = sim_func, extra_args, use_header/text, dataset, (types)
+def main(
+    dataset_name='185_baseball', 
+    configs = [
+        {'similarity_function': w2v_similarity, 'extra_args': None},
+        {'similarity_function': freq_nearest_similarity, 'extra_args': {'n_nearest': 3}},
+    ]):
     
-    # package data: concat then normalize headers and text columns
-    all_headers = normalize_headers(full_df.columns.values, model)
-    text = np.concatenate([text_df[h].values for h in text_df.columns])  # flatten content of all columns in word list
-    text = normalize_text(text, model)
-    
-    return np.concatenate([all_headers, text])  
-
-
-def load_types(model):
-    # load types and normalize (remove out of vocab etc.)
-    with open('models/types', 'r') as f:  
-        types = f.read().splitlines()
-        return normalize_types(types, model)  
-        
-
-def main(dataset_name = '185_baseball', n_keep = 20):
-    
-    # model = load_model()
     model = timeit(load_model)
-
     types = load_types(model)
-    # print('examples from types: ', types[:10], ', ... , ', types[-10:], '\n\n')
+    headers, text = load_dataset(dataset_name, model)
 
-    data = load_dataset(dataset_name, model)
-    # print('examples from data: ', data[:10], ', ... , ', data[-10:], '\n\n')
+    results = {}
+    for conf in configs:
+        sim_func = conf['similarity_function']
+        extra_args = conf.get('extra_args')
 
-    # sorted_types, similarities = get_similar_types(data, types, model)
-    sorted_types, similarities = timeit(get_similar_types, [data, types, model])
-    sorted_types = np.array([' '.join(typ) for typ in sorted_types])  # unpack lol with spaces between words and convert as np array
-   
-    print('top {0} types, similarities: \n'.format(n_keep))
-    for typ, sim in zip(sorted_types[:n_keep], similarities[:n_keep]):
-        print(typ, sim)
+        print('running trial with similarity function: ', sim_func.__name__, '\n')
+        if extra_args:
+            print('with extra args: ', extra_args, '\n')
 
+        print('headers only: \n')
+        sorted_types, similarities = trial(headers, text, types, model, sim_func, extra_args, use_headers=True, use_text=False)
+        results['{0}-headers'.format(sim_func.__name__)] = {'types': types, 'similarities': similarities}
+        log_top_similarities(sorted_types, similarities)
+
+        print('text only: \n')
+        sorted_types, similarities = trial(headers, text, types, model, sim_func, extra_args, use_headers=False, use_text=True)
+        results['{0}-text'.format(sim_func.__name__)] = {'types': types, 'similarities': similarities}
+        log_top_similarities(sorted_types, similarities)
+        
+        print('both headers and text: \n')
+        sorted_types, similarities = trial(headers, text, types, model, sim_func, extra_args, use_headers=True, use_text=True)
+        results['{0}-both'.format(sim_func.__name__)] = {'types': types, 'similarities': similarities}
+        log_top_similarities(sorted_types, similarities)
+
+    # print(results)
+    return results
 
 
 if __name__ == '__main__':
     main()
+

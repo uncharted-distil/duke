@@ -85,11 +85,31 @@ def buildCompleteTypeSet(bestWordsMap, childParentMap):
                     allTrees[str(parent)] = [word]
     return allTrees
 
+def getMaxLeaf(tree, scores):
+    keyScores = [(key, scores[key]) for key in tree.keys()]
+    maxKeyScore = max(keyScores, key=lambda x: x[1])
+    if(tree[maxKeyScore[0]] is None):
+        return maxKeyScore
+    else:
+        return getMaxLeaf(tree[maxKeyScore[0]], scores)
+
+def getDominantAncestor(childParentMap, scores, node):
+    parents = childParentMap[node]
+    parent = max([(p, scores[p]) for p in parents], key=lambda x: x[1])[0]
+    nodeScore = scores[node]
+    parentScore = scores[parent]
+    # Metric chosen largely at random and with minimal justification
+    if(parentScore > 2*nodeScore):
+        return getDominantAncestor(childParentMap, scores, parent)
+    else:
+        return node
 
 def getSentenceFromKeywords(keywords, verbose=False):
     # read in type heirarchy information
     with open('type_heirarchy.json', 'r') as file:
         childParentMap = json.loads(file.read())
+    # with open('inverted_type_heirarchy.json', 'r') as file:
+    #     parentChildMap = json.loads(file.read())
 
     # Filter out best words from model
     # NOTE: Hopefully this will not be needed once model is improved
@@ -128,23 +148,19 @@ def getSentenceFromKeywords(keywords, verbose=False):
         
     # Print results prettily
     resultString = prettyPrint(tree, scores, "", "", verbose=verbose)
-    with open('results.txt', 'w') as file:
+    with open('results.txt', 'w+') as file:
         file.write(resultString)
+
 
 
     # Largely ignore all work done above and print results from original model
 
     inf = English()
 
-    sentence = "This dataset is about "
-    addAnd = False
-    for word in keywords:
-        if word[1] == maxCountWords:
-            if not addAnd:
-                addAnd = True
-            else:
-                sentence += " and "
-            sentence += inf.pluralize(word[0])
+    sentence_prefix = "This dataset is about "
+    leafTerm = getMaxLeaf(tree, scores)
+    word = getDominantAncestor(childParentMap,scores,leafTerm[0])
+    sentence = sentence_prefix + inf.pluralize(word)
     if(verbose):
         print(sentence)
     return(sentence)

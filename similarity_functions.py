@@ -2,7 +2,7 @@ import numpy as np
 
 
 def w2v_similarity(words, types, model):
-    return np.array([model.wv.n_similarity(words, typ) for typ in types])
+    return np.array([model.wv.n_similarity(words, typ) for typ in types])/2 + 1/2  # normalize similarity between 0 and 1
 
 
 def freq_nearest_similarity(words, types, model, extra_args={'n_nearest': 3}):
@@ -24,10 +24,8 @@ def get_type_similarities(data, types, model, similarity_func=w2v_similarity, ex
     n_processed = 0
     for dat in data:
         try:
-            if extra_args:
-                similarities += similarity_func(dat, types, model, extra_args)
-            else:
-                similarities += similarity_func(dat, types, model) 
+            similarities += similarity_func(dat, types, model, extra_args) if extra_args \
+                       else similarity_func(dat, types, model) 
             n_processed += 1
                 
         except KeyError as err:
@@ -38,12 +36,8 @@ def get_type_similarities(data, types, model, similarity_func=w2v_similarity, ex
             raise err
 
     similarities /= max(1, n_processed)  # divide to get average 
-    print('average similarity max, min: ', np.max(similarities), ', ', np.min(similarities), '\n\n')
+    types = np.array([' '.join(typ) for typ in types])  # unpack lol with spaces between words and convert to np array
+    
+    # print('average similarity max, min: ', np.max(similarities), ', ', np.min(similarities), '\n\n')
 
-    # sort types by average similarity and unpack lists 
-    sort_indices = np.argsort(similarities)[::-1]
-    sorted_types = np.array(types)[sort_indices]
-    sorted_similarities = similarities[sort_indices]
-    sorted_types = np.array([' '.join(typ) for typ in sorted_types])  # unpack lol with spaces between words and convert to np array
-
-    return sorted_types, sorted_similarities
+    return similarities

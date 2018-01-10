@@ -30,9 +30,18 @@ def scoreNode(allTrees, leafScores, allScores, root_node):
         # METRIC
         # Accumulation function
         childScores = [allScores[str(node)] for node in allTrees[root_node]]
+
+        # max of children
+        # allScores[srt(root_node)] = max(childScores)
+
+        # average of children:
         # allScores[str(root_node)] = sum(childScores) / float(len(childScores))
+
+        # max of children + self:
+        # allScores[srt(root_node)] = max(childScores) + allScores[str(root_node)]
+
+        # average of children + self
         allScores[str(root_node)] = (sum(childScores) + allScores[str(root_node)]) / float(len(childScores) + 1)
-        # allScores[str(root_node)] = (sum(childScores)/float(len(childScores)) + allScores[str(root_node)]) / 2
     return allScores
 
 # Create a string which displays in a 'pretty' fashion the tree of types and 
@@ -98,6 +107,8 @@ def getMaxLeaf(tree, scores):
     else:
         return getMaxLeaf(tree[maxKeyScore[0]], scores)
 
+# Given a leaf node, walk up the tree until the 'dominant ancestor' is found
+# this dominant ancestor is determined by the if statement below
 def getDominantAncestor(childParentMap, scores, node):
     parents = childParentMap[node]
     parent = max([(p, scores[p]) for p in parents], key=lambda x: x[1])[0]

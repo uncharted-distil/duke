@@ -2,10 +2,12 @@ import re
 import time
 from datetime import datetime
 import json
+from inflection import underscore
 
 import numpy as np
 import pandas as pd
 from gensim.models import Word2Vec
+
 
 
 def timeit(func, args=None):
@@ -50,7 +52,7 @@ def load_dataset(dataset_name, model, drop_nan=True):
 
     for col in text_df.columns.values:
         print('normalizing column: ', col)
-        data[col] = normalize_text(text_df[col].values, model) 
+        data[normalize_words(col, to_list=False)] = normalize_text(text_df[col].values, model) 
 
     return data
 
@@ -61,20 +63,25 @@ def get_timestamp():
 
 def load_types(model):
     # load types and normalize (remove out of vocab etc.)
-    with open('models/ontologies/types', 'r') as f:  
+    with open('ontologies/types', 'r') as f:  
         types = f.read().splitlines()
         return normalize_types(types, model)  
 
 
-def normalize_words(s, replace_chars = {'_': ' ', '-': ' '}):
+def normalize_words(s, replace_chars = {'_': ' ', '-': ' '}, to_list=True):
+    s = underscore(s)  # ow need lower
     for old, new in replace_chars.items():
         s = s.replace(old, new)
-    return s.lower().split(' ')
+    if to_list:
+        return s.split(' ')
+    else:
+        return s  
 
 
 def normalize_types(types, model):
     # create a lol of types split by capitalization
     types = np.array([re.findall('[A-Z][^A-Z]*', typ) for typ in types])  # list of lists of single words
+    # types = np.array([normalize_words(typ) for typ in types])  # list of lists of single words
     # TODO more general processing? split by spaces?
     # remove types with out-of-vocab words
 

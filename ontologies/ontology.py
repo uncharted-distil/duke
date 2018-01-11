@@ -7,7 +7,10 @@ from inflection import underscore
 def to_class_name(class_obj):
     return underscore(str(class_obj.bestLabel())).replace('_', ' ') 
 
-def main(ontology_name = 'dbpedia_2016-10'):
+def has_relations(class_relations):
+    return (len(class_relations['children']) > 0) or (len(class_relations['parents']) > 0)
+
+def gen_class_relationships_file(ontology_name = 'dbpedia_2016-10', prune=True):
     print('loading ontology: ', ontology_name)
     ont = ontospy.Ontospy('{0}.nt'.format(ontology_name))
 
@@ -19,10 +22,14 @@ def main(ontology_name = 'dbpedia_2016-10'):
             'children': [to_class_name(c) for c in cl.children()], 
             }
 
+    if prune:
+        relationships = {name: rels for (name, rels) in relationships.items() if has_relations(rels)}
+
     print('writing class relationships to file')
-    with open('class-relationships_{0}.json'.format(ontology_name), 'w') as f:
-        json.dump(relationships, f, indent=2)
+    file_name = 'class-relationships_{0}{1}.json'.format(ontology_name, '_pruned' if prune else '')
+    with open(file_name, 'w') as f:
+        json.dump(relationships, f, indent=4)
 
 
 if __name__ == '__main__':
-    main()
+    gen_class_relationships_file()

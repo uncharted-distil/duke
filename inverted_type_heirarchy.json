@@ -1,0 +1,693 @@
+{
+    "Horse": [
+        "RaceHorse"
+    ],
+    "Eukaryote": [
+        "Animal",
+        "Fungus",
+        "Plant"
+    ],
+    "PeriodicalLiterature": [
+        "AcademicJournal",
+        "Magazine",
+        "Newspaper"
+    ],
+    "ChemicalSubstance": [
+        "Mineral",
+        "Drug",
+        "ChemicalCompound"
+    ],
+    "Olympics": [
+        "OlympicEvent"
+    ],
+    "SnookerPlayer": [
+        "SnookerChamp"
+    ],
+    "Document": [
+        "Sound"
+    ],
+    "Infrastructure": [
+        "Station",
+        "Dam",
+        "PowerStation",
+        "RouteOfTransportation",
+        "Airport",
+        "LaunchPad"
+    ],
+    "Company": [
+        "Airline",
+        "Publisher",
+        "Brewery",
+        "Bank",
+        "Winery",
+        "LawFirm",
+        "BusCompany",
+        "RecordLabel"
+    ],
+    "UnitOfWork": [
+        "Project",
+        "Case"
+    ],
+    "TimePeriod": [
+        "YearInSpaceflight",
+        "CareerStation",
+        "Year"
+    ],
+    "Building": [
+        "ReligiousBuilding",
+        "HistoricBuilding",
+        "Library",
+        "Prison",
+        "Museum",
+        "Hospital",
+        "Restaurant",
+        "Skyscraper",
+        "Hotel",
+        "Castle",
+        "ShoppingMall"
+    ],
+    "AmusementParkAttraction": [
+        "WaterRide",
+        "RollerCoaster"
+    ],
+    "BritishRoyalty": [
+        "Baronet"
+    ],
+    "OrganisationMember": [
+        "SportsTeamMember"
+    ],
+    "PopulatedPlace": [
+        "Region",
+        "Continent",
+        "Settlement",
+        "Island",
+        "Country"
+    ],
+    "Athlete": [
+        "HorseRider",
+        "Gymnast",
+        "SnookerPlayer",
+        "NetballPlayer",
+        "Rower",
+        "HandballPlayer",
+        "SoccerPlayer",
+        "WinterSportPlayer",
+        "GaelicGamesPlayer",
+        "BasketballPlayer",
+        "TennisPlayer",
+        "VolleyballPlayer",
+        "Cricketer",
+        "MartialArtist",
+        "MotorsportRacer",
+        "AustralianRulesFootballPlayer",
+        "Canoeist",
+        "PokerPlayer",
+        "DartsPlayer",
+        "TableTennisPlayer",
+        "SquashPlayer",
+        "GridironFootballPlayer",
+        "Jockey",
+        "Boxer",
+        "Cyclist",
+        "LacrossePlayer",
+        "RugbyPlayer",
+        "NationalCollegiateAthleticAssociationAthlete",
+        "Wrestler",
+        "ChessPlayer",
+        "BaseballPlayer",
+        "Swimmer",
+        "BadmintonPlayer",
+        "GolfPlayer",
+        "Bodybuilder"
+    ],
+    "EducationalInstitution": [
+        "University",
+        "Library",
+        "College",
+        "School"
+    ],
+    "Venue": [
+        "Theatre"
+    ],
+    "Project": [
+        "ResearchProject"
+    ],
+    "Organization": [
+        "Group"
+    ],
+    "Tower": [
+        "Lighthouse"
+    ],
+    "RacingDriver": [
+        "NascarDriver",
+        "FormulaOneRacer"
+    ],
+    "Biomolecule": [
+        "Enzyme",
+        "Gene",
+        "Protein"
+    ],
+    "Agent": [
+        "Person",
+        "Organisation"
+    ],
+    "Station": [
+        "RailwayStation"
+    ],
+    "MusicGroup": [
+        "Band",
+        "MusicalArtist"
+    ],
+    "DUL.owl#SocialPerson": [
+        "Band"
+    ],
+    "Species": [
+        "Eukaryote",
+        "Archaea",
+        "Bacteria"
+    ],
+    "Case": [
+        "LegalCase"
+    ],
+    "CelestialBody": [
+        "Star",
+        "Satellite",
+        "Planet",
+        "Galaxy",
+        "Constellation",
+        "Asteroid"
+    ],
+    "Animal": [
+        "Crustacean",
+        "Reptile",
+        "Mammal",
+        "Bird",
+        "Fish",
+        "Arachnid",
+        "Amphibian",
+        "Insect",
+        "Mollusca"
+    ],
+    "Festival": [
+        "FilmFestival"
+    ],
+    "Organisation": [
+        "PoliticalParty",
+        "Non-ProfitOrganisation",
+        "Group",
+        "TradeUnion",
+        "SportsLeague",
+        "Legislature",
+        "PublicTransitSystem",
+        "SportsTeam",
+        "GovernmentAgency",
+        "MilitaryUnit",
+        "Company",
+        "EducationalInstitution",
+        "Broadcaster"
+    ],
+    "Actor": [
+        "VoiceActor",
+        "AdultActor"
+    ],
+    "Criminal": [
+        "Murderer"
+    ],
+    "LegalCase": [
+        "SupremeCourtOfTheUnitedStatesCase"
+    ],
+    "Name": [
+        "GivenName",
+        "Surname"
+    ],
+    "Engine": [
+        "AutomobileEngine"
+    ],
+    "Satellite": [
+        "ArtificialSatellite"
+    ],
+    "Song": [
+        "EurovisionSongContestEntry"
+    ],
+    "RaceTrack": [
+        "Racecourse"
+    ],
+    "BodyOfWater": [
+        "Stream",
+        "Bay",
+        "Sea",
+        "Lake"
+    ],
+    "MusicalArtist": [
+        "ClassicalMusicArtist",
+        "Instrumentalist"
+    ],
+    "Cartoon": [
+        "HollywoodCartoon",
+        "Anime"
+    ],
+    "SportsManager": [
+        "SoccerManager"
+    ],
+    "Politician": [
+        "MemberOfParliament",
+        "Chancellor",
+        "Senator",
+        "Governor",
+        "President",
+        "Mayor",
+        "PrimeMinister",
+        "Congressman"
+    ],
+    "MotorsportRacer": [
+        "RacingDriver",
+        "MotorcycleRider"
+    ],
+    "Work": [
+        "TelevisionSeason",
+        "WrittenWork",
+        "Film",
+        "Cartoon",
+        "Website",
+        "Database",
+        "TelevisionEpisode",
+        "TelevisionShow",
+        "Document",
+        "RadioProgram",
+        "Software",
+        "MusicalWork",
+        "Artwork"
+    ],
+    "ArchitecturalStructure": [
+        "AmusementParkAttraction",
+        "MilitaryStructure",
+        "Venue",
+        "Tower",
+        "Infrastructure",
+        "Tunnel",
+        "Building",
+        "SportFacility"
+    ],
+    "Race": [
+        "CyclingRace",
+        "HorseRace"
+    ],
+    "Place": [
+        "WorldHeritageSite",
+        "ProtectedArea",
+        "PopulatedPlace",
+        "HistoricPlace",
+        "Park",
+        "ArchitecturalStructure",
+        "SiteOfSpecialScientificInterest",
+        "Garden",
+        "WineRegion",
+        "NaturalPlace",
+        "CelestialBody",
+        "Monument"
+    ],
+    "Wrestler": [
+        "SumoWrestler"
+    ],
+    "SocietalEvent": [
+        "FilmFestival",
+        "MilitaryConflict",
+        "Election",
+        "MusicFestival",
+        "Convention",
+        "SportsEvent"
+    ],
+    "Stream": [
+        "Canal",
+        "River"
+    ],
+    "Tournament": [
+        "SoccerTournament",
+        "TennisTournament",
+        "WomensTennisAssociationTournament",
+        "GolfTournament"
+    ],
+    "Event": [
+        "SocietalEvent",
+        "NaturalEvent"
+    ],
+    "Scientist": [
+        "Medician",
+        "Entomologist"
+    ],
+    "NaturalPlace": [
+        "Mountain",
+        "Valley",
+        "Glacier",
+        "BodyOfWater",
+        "MountainPass",
+        "Cave",
+        "Volcano",
+        "MountainRange",
+        "Crater"
+    ],
+    "owl#Thing": [
+        "Award",
+        "ChemicalSubstance",
+        "Place",
+        "TopicalConcept",
+        "MeanOfTransportation",
+        "Disease",
+        "TimePeriod",
+        "Event",
+        "Work",
+        "Currency",
+        "Activity",
+        "SportCompetitionResult",
+        "Language",
+        "Food",
+        "Name",
+        "UnitOfWork",
+        "Agent",
+        "SportsSeason",
+        "Holiday",
+        "GeneLocation",
+        "PersonFunction",
+        "Colour",
+        "Biomolecule",
+        "Species",
+        "EthnicGroup",
+        "AnatomicalStructure",
+        "Device"
+    ],
+    "GridironFootballPlayer": [
+        "AmericanFootballPlayer"
+    ],
+    "Comic": [
+        "Manga",
+        "ComicStrip"
+    ],
+    "RouteOfTransportation": [
+        "RailwayTunnel",
+        "RailwayLine",
+        "RoadJunction",
+        "Road",
+        "Bridge",
+        "RoadTunnel",
+        "WaterwayTunnel"
+    ],
+    "Group": [
+        "ComedyGroup",
+        "Band"
+    ],
+    "MotorcycleRider": [
+        "SpeedwayRider"
+    ],
+    "FictionalCharacter": [
+        "SoapCharacter",
+        "ComicsCharacter",
+        "MythologicalFigure"
+    ],
+    "Book": [
+        "Novel"
+    ],
+    "SportsSeason": [
+        "SportsTeamSeason",
+        "MotorsportSeason"
+    ],
+    "Instrumentalist": [
+        "Guitarist"
+    ],
+    "DUL.owl#NaturalPerson": [
+        "MusicalArtist"
+    ],
+    "Cleric": [
+        "Saint",
+        "Cardinal",
+        "Pope",
+        "ChristianBishop"
+    ],
+    "Boxer": [
+        "AmateurBoxer"
+    ],
+    "SportCompetitionResult": [
+        "SnookerWorldRanking",
+        "OlympicResult"
+    ],
+    "AnatomicalStructure": [
+        "Ligament",
+        "Embryology",
+        "Muscle",
+        "Vein",
+        "Bone",
+        "Lymph",
+        "Nerve",
+        "Artery",
+        "Brain"
+    ],
+    "Royalty": [
+        "BritishRoyalty"
+    ],
+    "Device": [
+        "Weapon",
+        "Engine",
+        "InformationAppliance"
+    ],
+    "NaturalEvent": [
+        "SolarEclipse",
+        "Earthquake"
+    ],
+    "Language": [
+        "ProgrammingLanguage"
+    ],
+    "Database": [
+        "BiologicalDatabase"
+    ],
+    "TopicalConcept": [
+        "Genre",
+        "Fashion"
+    ],
+    "Presenter": [
+        "TelevisionHost",
+        "RadioHost"
+    ],
+    "Broadcaster": [
+        "TelevisionStation",
+        "BroadcastNetwork",
+        "RadioStation"
+    ],
+    "Gene": [
+        "MouseGene",
+        "HumanGene"
+    ],
+    "FloweringPlant": [
+        "Grape"
+    ],
+    "Software": [
+        "VideoGame"
+    ],
+    "GeneLocation": [
+        "HumanGeneLocation",
+        "MouseGeneLocation"
+    ],
+    "VolleyballPlayer": [
+        "BeachVolleyballPlayer"
+    ],
+    "WinterSportPlayer": [
+        "FigureSkater",
+        "Curler",
+        "IceHockeyPlayer",
+        "Skier",
+        "Skater"
+    ],
+    "Settlement": [
+        "Town",
+        "Village",
+        "City"
+    ],
+    "Writer": [
+        "Poet",
+        "Historian",
+        "ScreenWriter"
+    ],
+    "AdministrativeRegion": [
+        "ClericalAdministrativeRegion"
+    ],
+    "SportsEvent": [
+        "Olympics",
+        "WrestlingEvent",
+        "GrandPrix",
+        "Tournament",
+        "FootballMatch",
+        "Race",
+        "NationalFootballLeagueEvent",
+        "MixedMartialArtsEvent"
+    ],
+    "MeanOfTransportation": [
+        "Rocket",
+        "Ship",
+        "SpaceStation",
+        "SpaceShuttle",
+        "Motorcycle",
+        "Aircraft",
+        "Automobile",
+        "Locomotive",
+        "Spacecraft",
+        "Train"
+    ],
+    "SportsLeague": [
+        "VolleyballLeague",
+        "BaseballLeague",
+        "IceHockeyLeague",
+        "MotorcycleRacingLeague",
+        "GolfLeague",
+        "VideogamesLeague",
+        "HandballLeague",
+        "BowlingLeague",
+        "TennisLeague",
+        "RugbyLeague",
+        "InlineHockeyLeague",
+        "LacrosseLeague",
+        "CurlingLeague",
+        "FieldHockeyLeague",
+        "AmericanFootballLeague",
+        "SoccerLeague",
+        "SpeedwayLeague",
+        "MixedMartialArtsLeague",
+        "PoloLeague",
+        "AustralianFootballLeague",
+        "CricketLeague",
+        "SoftballLeague",
+        "CanadianFootballLeague",
+        "BasketballLeague",
+        "AutoRacingLeague"
+    ],
+    "Food": [
+        "Beverage",
+        "Cheese"
+    ],
+    "FootballLeagueSeason": [
+        "NationalFootballLeagueSeason"
+    ],
+    "Genre": [
+        "MusicGenre"
+    ],
+    "MusicalWork": [
+        "ArtistDiscography",
+        "ClassicalMusicComposition",
+        "Single",
+        "Song",
+        "Album",
+        "Musical"
+    ],
+    "Region": [
+        "AdministrativeRegion"
+    ],
+    "ComicsCharacter": [
+        "AnimangaCharacter"
+    ],
+    "WrittenWork": [
+        "Book",
+        "Poem",
+        "Comic",
+        "PeriodicalLiterature",
+        "Play"
+    ],
+    "Artist": [
+        "Comedian",
+        "ComicsCreator",
+        "Photographer",
+        "FashionDesigner",
+        "Actor",
+        "MusicalArtist",
+        "Painter"
+    ],
+    "SportsTeam": [
+        "BaseballTeam",
+        "HockeyTeam",
+        "AustralianFootballTeam",
+        "RugbyClub",
+        "CanadianFootballTeam",
+        "SpeedwayTeam",
+        "AmericanFootballTeam",
+        "SoccerClub",
+        "BasketballTeam",
+        "CricketTeam",
+        "CyclingTeam",
+        "FormulaOneTeam",
+        "HandballTeam"
+    ],
+    "Plant": [
+        "FloweringPlant",
+        "Fern",
+        "GreenAlga",
+        "ClubMoss",
+        "Ginkgo",
+        "Cycad",
+        "Conifer",
+        "CultivatedVariety",
+        "Moss",
+        "Gnetophytes"
+    ],
+    "ClericalAdministrativeRegion": [
+        "Diocese"
+    ],
+    "Activity": [
+        "Game",
+        "Sport",
+        "Sales"
+    ],
+    "Mammal": [
+        "Horse"
+    ],
+    "SportFacility": [
+        "CricketGround",
+        "SkiArea",
+        "GolfCourse",
+        "RaceTrack",
+        "Stadium"
+    ],
+    "Coach": [
+        "AmericanFootballCoach",
+        "VolleyballCoach",
+        "CollegeCoach"
+    ],
+    "Person": [
+        "Ambassador",
+        "Monarch",
+        "Religious",
+        "FictionalCharacter",
+        "Royalty",
+        "OfficeHolder",
+        "Noble",
+        "Model",
+        "Judge",
+        "OrganisationMember",
+        "Architect",
+        "MilitaryPerson",
+        "Criminal",
+        "SportsManager",
+        "HorseTrainer",
+        "Economist",
+        "BusinessPerson",
+        "Engineer",
+        "Artist",
+        "Chef",
+        "Politician",
+        "Journalist",
+        "Cleric",
+        "BeautyQueen",
+        "Astronaut",
+        "Athlete",
+        "Scientist",
+        "Writer",
+        "Philosopher",
+        "PlayboyPlaymate",
+        "Coach",
+        "Presenter"
+    ],
+    "SportsTeamSeason": [
+        "SoccerClubSeason",
+        "NCAATeamSeason",
+        "FootballLeagueSeason",
+        "BaseballSeason"
+    ],
+    "Product": [
+        "Weapon"
+    ]
+}

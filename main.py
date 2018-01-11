@@ -1,9 +1,11 @@
+import sys
 import json
 import time
 from datetime import datetime
 
 import numpy as np
 
+from identify_subject import getSentenceFromKeywords
 from similarity_functions import (freq_nearest_similarity,
                                   get_type_similarities, w2v_similarity)
 from utils import (get_timestamp, load_dataset, load_model, load_types,
@@ -59,10 +61,28 @@ def main(
         
         with open('trials/trial{0}'.format(get_timestamp()), 'w') as f:
             json.dump(record, f, cls=NumpyEncoder)
-        
-    return results
+    top_n = {}
+    n = 10
+    parsedTypes = [''.join(a) for a in types]
+    for header in similarities.keys():
+        best = sorted(zip(parsedTypes, similarities[header]), key=lambda x: x[1], reverse=True)[0:10]
+        top_n[header] = best
+        # print(header)
+        # print(best)
+        print(header + ": " + getSentenceFromKeywords(best))
+        # print("===============")
+
+    all_types = []
+    for key in top_n.keys():
+        all_types.extend(top_n[key])
+    
+    print("Total: " + getSentenceFromKeywords(all_types))
+
+    return {}
+
+
 
 
 
 if __name__ == '__main__':
-    print(main())
+    print(main(dataset_name=sys.argv[1]))

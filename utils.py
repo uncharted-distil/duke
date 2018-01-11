@@ -21,7 +21,7 @@ def load_model(model_name='wiki2vec'):
     models = {
         'wiki2vec': 'en_1000_no_stem/en.model',  # w2v model file paths hard coded here
     }
-    return Word2Vec.load("models/word2vec/{0}".format(models[model_name]))
+    return Word2Vec.load("/data/duke/models/word2vec/{0}".format(models[model_name]))
 
 
 def get_dropped(all_headers, new_headers):
@@ -29,7 +29,7 @@ def get_dropped(all_headers, new_headers):
 
 
 def load_dataset(dataset_name, model, drop_nan=True):
-    csv_path = 'data/{0}/{0}_dataset/tables/learningData.csv'.format(dataset_name)
+    csv_path = '/data/duke/data/{0}/{0}_dataset/tables/learningData.csv'.format(dataset_name)
     full_df = pd.read_csv(csv_path, header=0)  # read csv assuming first line has header text. TODO handle files w/o headers
     headers = full_df.columns.values
 
@@ -61,7 +61,7 @@ def get_timestamp():
 
 def load_types(model):
     # load types and normalize (remove out of vocab etc.)
-    with open('models/ontologies/types', 'r') as f:  
+    with open('/data/duke/models/ontologies/types', 'r') as f:  
         types = f.read().splitlines()
         return normalize_types(types, model)  
 

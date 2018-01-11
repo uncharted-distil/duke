@@ -66,6 +66,12 @@ def load_types(model):
         return normalize_types(types, model)  
 
 
+def normalize_words(s, replace_chars = {'_': ' ', '-': ' '}):
+    for old, new in replace_chars.items():
+        s = s.replace(old, new)
+    return s.lower().split(' ')
+
+
 def normalize_types(types, model):
     # create a lol of types split by capitalization
     types = np.array([re.findall('[A-Z][^A-Z]*', typ) for typ in types])  # list of lists of single words
@@ -79,7 +85,7 @@ def normalize_types(types, model):
 
 
 def normalize_headers(headers, model):
-    headers = np.array([h.replace('_', ' ').replace('-', ' ').lower().split(' ') for h in headers])  # list of lists of single words
+    headers = np.array([normalize_words(h) for h in headers])  # list of lists of single words
 
     in_vocab = [np.all([word in model.wv.vocab for word in h]) for h in headers]   
     print('dropped {0} out of {1} headers for having out-of-vocab words. \n'.format(len(headers) - sum(in_vocab), len(headers)))
@@ -88,7 +94,7 @@ def normalize_headers(headers, model):
 
 
 def normalize_text(text, model):
-    text = np.array([t.replace('_', ' ').replace('-', ' ').lower().split(' ') for t in text])  # list of lists of single words
+    text = np.array([normalize_words(t) for t in text])  # list of lists of single words
 
     in_vocab = [np.all([word in model.wv.vocab for word in t]) for t in text]
     print('dropped {0} out of {1} text values for having out-of-vocab words \n'.format(len(text) - sum(in_vocab), len(text)))
@@ -96,7 +102,7 @@ def normalize_text(text, model):
     return text[in_vocab] 
 
 
-def log_top_similarities(sorted_types, similarities, n_keep=20):
+def print_top_similarities(sorted_types, similarities, n_keep=20):
     print('top {0} types, similarities: \n'.format(n_keep))
     for typ, sim in zip(sorted_types[:n_keep], similarities[:n_keep]):
         print(typ, sim)

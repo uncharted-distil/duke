@@ -1,3 +1,4 @@
+import random
 import numpy as np
 
 
@@ -21,8 +22,9 @@ def freq_nearest_similarity(words, types, model, extra_args={'n_nearest': 3}):
 def get_type_similarities(data, types, model, similarity_func=w2v_similarity, extra_args=None):
 
     similarities = np.zeros(len(types))
+    numsamples = 500
     n_processed = 0
-    for dat in data:
+    for dat in data[0:max(len(data), numsamples)]:
         try:
             similarities += similarity_func(dat, types, model, extra_args) if extra_args \
                        else similarity_func(dat, types, model) 
@@ -33,6 +35,8 @@ def get_type_similarities(data, types, model, similarity_func=w2v_similarity, ex
             raise err
         except Exception as err:
             print('unknown error: ', err)
+            print(dat)
+            print("==========")
             raise err
 
     similarities /= max(1, n_processed)  # divide to get average 

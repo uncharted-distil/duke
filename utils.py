@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 from gensim.models import Word2Vec
 
+from ontologies.ontology import get_relationships_file_name
+
 
 
 def timeit(func, args=None):
@@ -41,6 +43,7 @@ def load_dataset(dataset_name, model, drop_nan=True):
     print('dropped non-text columns: {0} \n'.format(list(dtype_dropped)))
 
     if drop_nan: # drop columns if there are any missing values
+        # TODO handle missing values w/o dropping whole column
         text_df = text_df.dropna(axis=1, how='any')
         nan_dropped = get_dropped(headers, text_df.columns.values)
         nan_dropped = nan_dropped.difference(dtype_dropped)
@@ -61,11 +64,13 @@ def get_timestamp():
     return datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
 
 
-def load_types(model):
-    # load types and normalize (remove out of vocab etc.)
-    with open('ontologies/types', 'r') as f:  
-        types = f.read().splitlines()
-        return normalize_types(types, model)  
+def load_class_relationships(model, ontology_name='dbpedia_2016-10', prune=True):
+
+    rels_file_name = get_relationships_file_name(ontology_name, prune)
+    with open('ontologies/{0}'.format(rels_file_name), 'r') as f:  
+        relationships = json.load(f)
+
+    return normalize_classes(relationships, model)
 
 
 def normalize_words(s, replace_chars = {'_': ' ', '-': ' '}, to_list=True):
@@ -77,19 +82,23 @@ def normalize_words(s, replace_chars = {'_': ' ', '-': ' '}, to_list=True):
     else:
         return s  
 
+def in_vocab(word_list, model):
+    if isinstance(word_list, str):
+        word_list = word_list.split(' ')
+    return all([word in model.wv.vocab for word in word_list])
+        
 
-def normalize_types(types, model):
-    # create a lol of types split by capitalization
-    types = np.array([re.findall('[A-Z][^A-Z]*', typ) for typ in types])  # list of lists of single words
-    # types = np.array([normalize_words(typ) for typ in types])  # list of lists of single words
-    # TODO more general processing? split by spaces?
-    # remove types with out-of-vocab words
+def normalize_classes(relationships, model):
+    # filter out keys with out-of-vocab words (strict by default -- all words in class name must be in vocab)
+    relationships = {name: rels for (name, rels) in relationships.items() if in_vocab(name, model)}
+    classes = relationships.keys()  # filtered class list
 
-    in_vocab = [np.all([word in model.wv.vocab for word in typ]) for typ in types]   
-    print('dropped {0} out of {1} type values for having out-of-vocab words. \n'.format(len(types) - sum(in_vocab), len(types)))
+    # remove filtered classes from parent and child lists
+    for name, rels in relationships: 
+        rels['children'] = [cl in rels['children'] if (cl in classes)] 
+        rels['parents'] = [cl in rels['parents'] if (cl in classes)] 
 
-    return types[in_vocab]
-
+    return relationships
 
 def normalize_headers(headers, model):
     headers = np.array([normalize_words(h) for h in headers])  # list of lists of single words
@@ -109,10 +118,14 @@ def normalize_text(text, model):
     return text[in_vocab] 
 
 
-def print_top_similarities(sorted_types, similarities, n_keep=20):
-    print('top {0} types, similarities: \n'.format(n_keep))
-    for typ, sim in zip(sorted_types[:n_keep], similarities[:n_keep]):
-        print(typ, sim)
+def print_top_similarities(classes, similarities, n_keep=20):
+    sort_inds = np.argsort(similarities)[::-1]
+    similarities = similarities[sort_inds]
+    classes = classes[sort_inds]
+
+    print('top {0} classes, similarities: \n'.format(n_keep))
+    for cl, sim in zip(classes[:n_keep], similarities[:n_keep]):
+        print(cl, sim)
     print('\n\n')
 
 

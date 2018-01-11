@@ -7,7 +7,7 @@ from inflector import English
 # This is the import to my custom handler -- can be replaced
 # from nl import getTypeFromFile
 
-# Build dictionary containing the heirarchy of types. If a type has sub-types
+# Build dictionary containing the heirarchy of classes. If a class has sub-classes
 # in the results, then the value at htat type will be another dictionary, but if
 # the type is a leaf, then the value will be None
 def getLeaves(allTrees, node):
@@ -44,7 +44,7 @@ def scoreNode(allTrees, leafScores, allScores, root_node):
         allScores[str(root_node)] = (sum(childScores) + allScores[str(root_node)]) / float(len(childScores) + 1)
     return allScores
 
-# Create a string which displays in a 'pretty' fashion the tree of types and 
+# Create a string which displays in a 'pretty' fashion the tree of classes and 
 # the values of each type, sorted in descending order
 def prettyPrint(tree, scores, prefix, resultString, verbose=False):
     dicts = filter(lambda x: not tree[x] is None, tree.keys())

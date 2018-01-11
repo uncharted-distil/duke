@@ -71,10 +71,21 @@ def main(
         # print(best)
         print(header + ": " + getSentenceFromKeywords(best))
         # print("===============")
+    
+
 
     all_types = []
     for key in top_n.keys():
         all_types.extend(top_n[key])
+    all_types_aggregated = {}
+    for t_score in all_types:
+        all_types_aggregated[t_score[0]] = 0.0
+    for t_score in all_types:
+        all_types_aggregated[t_score[0]] = all_types_aggregated[t_score[0]] + t_score[1] 
+
+    all_types = []
+    for key in all_types_aggregated.keys():
+        all_types.append((key, all_types_aggregated[key]))
     
     print("Total: " + getSentenceFromKeywords(all_types))
 

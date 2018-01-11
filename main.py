@@ -57,8 +57,11 @@ def main(
             'similarities': similarities,  # dict mapping column headers to similarity vectors (in the same order as types list)
             }
         
-        with open('trial-results/trial{0}'.format(get_timestamp()), 'w') as f:
-            json.dump(record, f, cls=NumpyEncoder)
+        print('\n writing trial results to file')
+        with open('trial-results/trial_{0}.json'.format(get_timestamp()), 'w') as f:
+            json.dump(record, f, cls=NumpyEncoder, indent=4)
+
+    
 
 
 if __name__ == '__main__':

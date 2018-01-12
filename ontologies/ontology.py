@@ -17,16 +17,23 @@ def gen_class_relationships_file(ontology_name = 'dbpedia_2016-10', prune=True):
     print('loading ontology: ', ontology_name)
     ont = ontospy.Ontospy('{0}.nt'.format(ontology_name))
 
+    all_classes = set()
     print('building class relationships')
     relationships = {}
     for cl in ont.classes:
         relationships[to_class_name(cl)] = {
-            'parents': [to_class_name(c) for c in cl.parents()], 
+            'parents': [to_class_name(p) for p in cl.parents()], 
             'children': [to_class_name(c) for c in cl.children()], 
             }
+            
+        parents = set([to_class_name(p) for p in cl.parents()])
+        children = set([to_class_name(c) for c in cl.children()])
+        all_classes = all_classes.union(parents, children, set([to_class_name(cl)]))
 
     if prune:
         relationships = {name: rels for (name, rels) in relationships.items() if has_relations(rels)}
+
+    assert(len(all_classes) == len(relationships.keys()))
 
     print('writing class relationships to file')
     file_name = get_relationships_file_name(ontology_name, prune)

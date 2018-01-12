@@ -12,7 +12,7 @@ def freq_nearest_similarity(words, classes, model, extra_args={'n_nearest': 3}):
     similarities = w2v_similarity(words, classes, model)
     sorted_inds = np.argsort(similarities)[::-1]
 
-    # return indicator vector for classes that are among the n_nearest most similar
+    # return indicator vector for the n_nearest most similar classes
     neighbors = np.zeros(len(classes))
     neighbors[sorted_inds[:n_nearest]] = 1
 
@@ -20,6 +20,9 @@ def freq_nearest_similarity(words, classes, model, extra_args={'n_nearest': 3}):
 
 
 def get_class_similarities(data, classes, model, similarity_func=w2v_similarity, extra_args=None):
+
+    # convert classes that are strings into lists of words
+    classes = [cl.split(' ') if isinstance(cl, str) else cl for cl in classes]
 
     similarities = np.zeros(len(classes))
     n_processed = 0

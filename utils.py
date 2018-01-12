@@ -25,7 +25,7 @@ def load_model(model_name='wiki2vec'):
     models = {
         'wiki2vec': 'en_1000_no_stem/en.model',  # w2v model file paths hard coded here
     }
-    return Word2Vec.load("/data/duke/models/word2vec/{0}".format(models[model_name]))
+    return Word2Vec.load("models/word2vec/{0}".format(models[model_name]))
 
 
 def get_dropped(all_headers, new_headers):
@@ -33,7 +33,7 @@ def get_dropped(all_headers, new_headers):
 
 
 def load_dataset(dataset_name, model, drop_nan=True):
-    csv_path = '/data/duke/data/{0}/{0}_dataset/tables/learningData.csv'.format(dataset_name)
+    csv_path = 'data/{0}/{0}_dataset/tables/learningData.csv'.format(dataset_name)
     full_df = pd.read_csv(csv_path, header=0)  # read csv assuming first line has header text. TODO handle files w/o headers
     headers = full_df.columns.values
 
@@ -89,16 +89,17 @@ def in_vocab(word_list, model):
         
 
 def normalize_classes(relationships, model):
-    # filter out keys with out-of-vocab words (strict by default -- all words in class name must be in vocab)
+    # filter out keys with out-of-vocab words -- all words in class name must be in vocab
     relationships = {name: rels for (name, rels) in relationships.items() if in_vocab(name, model)}
-    classes = relationships.keys()  # filtered class list
+    classes = list(relationships.keys())  # filtered class list
 
     # remove filtered classes from parent and child lists
-    for name, rels in relationships: 
-        rels['children'] = [cl in rels['children'] if (cl in classes)] 
-        rels['parents'] = [cl in rels['parents'] if (cl in classes)] 
+    for name, rels in relationships.items(): 
+        rels['children'] = [cl for cl in rels['children'] if (cl in classes)] 
+        rels['parents'] = [cl for cl in rels['parents'] if (cl in classes)] 
 
     return relationships
+
 
 def normalize_headers(headers, model):
     headers = np.array([normalize_words(h) for h in headers])  # list of lists of single words
@@ -118,14 +119,24 @@ def normalize_text(text, model):
     return text[in_vocab] 
 
 
-def print_top_similarities(classes, similarities, n_keep=20):
-    sort_inds = np.argsort(similarities)[::-1]
-    similarities = similarities[sort_inds]
+def print_top_similarities(classes, score, n_keep=20):
+
+
+    # convert lists, dicts to np arrays
+    if isinstance(classes, list): 
+        classes = np.array(classes)
+    if isinstance(score, list): 
+        score = np.array(score)
+    if isinstance(score, dict):
+        score = np.array([score[cl] for cl in classes])
+
+    sort_inds = np.argsort(score)[::-1]
+    score = score[sort_inds]
     classes = classes[sort_inds]
 
-    print('top {0} classes, similarities: \n'.format(n_keep))
-    for cl, sim in zip(classes[:n_keep], similarities[:n_keep]):
-        print(cl, sim)
+    print('top {0} classes, score: \n'.format(n_keep))
+    for cl, sim in zip(classes[:n_keep], score[:n_keep]):
+        print(cl,': ', sim)
     print('\n\n')
 
 

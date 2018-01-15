@@ -35,7 +35,7 @@ def aggregate_score(score_map, tree, agg_func):
 
         layer = set.union(*[set(tree[node]['parents']) for node in layer])  # get parents of previous layers
         layer = layer.difference(processed)  # remove already processed
-        layer = set([n for n in layer if all_children_aggd(n)])  # keep nodes where all child values have been computed
+        layer = [n for n in layer if all_children_aggd(n)]  # keep nodes where all child values have been computed
         process_layer(layer)
     
     # print('done aggregating over the tree \n')
@@ -43,7 +43,6 @@ def aggregate_score(score_map, tree, agg_func):
     return agg_score
 
 
-# def apply_agg_func(node, score, tree, agg_score, agg_func=np.mean):
 def apply_agg_func(node, score_map, tree, agg_score, agg_func=np.mean):
     score_list = [score_map[node]]
     relations = tree[node]

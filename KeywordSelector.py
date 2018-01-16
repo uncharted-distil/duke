@@ -1,6 +1,10 @@
 '''
 Given an arbitrary type tree, a set of corresponding scores, and a map from child
 nodes to their parents, select the best keyword from the tree
+tree: dictionary of dictionaries with the entire heirarchy of types
+    involved in this dataset
+scores: a dictionary of keyword to score for every type in tree
+childParentMap: a map from every node to its parents
 '''
 class KeywordSelector:
     def __init__(self, tree, scores, childParentMap):

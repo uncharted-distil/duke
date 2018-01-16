@@ -1,7 +1,11 @@
-
-# Calculate a score for every node, where the value is the sum of its value
-# and the value of all of its children
-# Create map from each type to its accumulated value
+'''
+Calculate a score for every node, where the value is the sum of its value
+and the value of all of its children
+allTrees: a map between each type and any sub-types it has, including only
+    those types found in this dataset
+parentChildMap: a map between every possible type and its subtypes
+wordmap: a map between each identified type and its score
+'''
 class ScoreAccumulator:
     def __init__(self, allTrees, parentChildMap, wordmap):
         self.allTrees = allTrees

@@ -1,5 +1,9 @@
 # Create a string which displays in a 'pretty' fashion the tree of types and 
 # the values of each type, sorted in descending order
+'''
+allTrees: dictionary of each node and its children
+scores: a dictionary of keyword to score for every type 
+'''
 class PrettyPrinter:
     def __init__(self, allTrees, scores, verbose=False):
         self.allTrees = allTrees

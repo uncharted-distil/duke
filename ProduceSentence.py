@@ -74,15 +74,16 @@ class ProduceSentence():
                 json.dump(record, f, cls=NumpyEncoder)
 
         top_n = {}
-        n = 40
+        n = 10
+        returnSentence = ""
         parsedTypes = [''.join(a) for a in self.types]
         for header in similarities.keys():
-            best = sorted(zip(parsedTypes, similarities[header]), key=lambda x: x[1], reverse=True)[0:10]
+            best = sorted(zip(parsedTypes, similarities[header]), key=lambda x: x[1], reverse=True)[0:n]
             top_n[header] = best
-            # print(header)
+            returnSentence = returnSentence + header + ": " + getSentenceFromKeywords(best, type_heirarchy_filename=self.type_heirarchy_filename, verbose=False) + "\n" 
             if(self.verbose):
                 print(best)
-                print(header + ": " + getSentenceFromKeywords(best, type_heirarchy_filename=self.type_heirarchy_filename))
+                print(header + ": " + getSentenceFromKeywords(best, type_heirarchy_filename=self.type_heirarchy_filename, verbose=True))
 
         all_types = []
         for key in top_n.keys():
@@ -97,4 +98,6 @@ class ProduceSentence():
         for key in all_types_aggregated.keys():
             all_types.append((key, all_types_aggregated[key]))
         
-        return getSentenceFromKeywords(all_types)
+        returnSentence = returnSentence + "\nOverll data contents: " + getSentenceFromKeywords(all_types, type_heirarchy_filename=self.type_heirarchy_filename, verbose=self.verbose)
+
+        return returnSentence

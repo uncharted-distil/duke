@@ -38,7 +38,6 @@ def get_class_similarities(data, classes, model, similarity_func=w2v_similarity,
         except Exception as err:
             print('unknown error: ', err)
             print('data being processed: {0}'.format(dat))
-            print('==========\n')
             raise err
 
     similarities /= max(1, n_processed)  # divide to get average 

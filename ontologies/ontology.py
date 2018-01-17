@@ -10,10 +10,11 @@ def to_class_name(class_obj):
 def has_relations(class_relations):
     return (len(class_relations['children']) > 0) or (len(class_relations['parents']) > 0)
 
-def get_relationships_file_name(ontology_name, prune=True):
+def get_tree_file_name(ontology_name, prune=True):
+    print('ontology name:', ontology_name)
     return 'class-relationships_{0}{1}.json'.format(ontology_name, '_pruned' if prune else '')
 
-def gen_class_relationships_file(ontology_name = 'dbpedia_2016-10', prune=True):
+def generate_class_tree_file(ontology_name = 'dbpedia_2016-10', prune=True):
     print('loading ontology: ', ontology_name)
     ont = ontospy.Ontospy('{0}.nt'.format(ontology_name))
 
@@ -25,7 +26,7 @@ def gen_class_relationships_file(ontology_name = 'dbpedia_2016-10', prune=True):
             'parents': [to_class_name(p) for p in cl.parents()], 
             'children': [to_class_name(c) for c in cl.children()], 
             }
-            
+
         parents = set([to_class_name(p) for p in cl.parents()])
         children = set([to_class_name(c) for c in cl.children()])
         all_classes = all_classes.union(parents, children, set([to_class_name(cl)]))
@@ -36,10 +37,10 @@ def gen_class_relationships_file(ontology_name = 'dbpedia_2016-10', prune=True):
     assert(len(all_classes) == len(relationships.keys()))
 
     print('writing class relationships to file')
-    file_name = get_relationships_file_name(ontology_name, prune)
+    file_name = get_tree_file_name(ontology_name, prune)
     with open(file_name, 'w') as f:
         json.dump(relationships, f, indent=4)
 
 
 if __name__ == '__main__':
-    gen_class_relationships_file()
+    generate_class_tree_file()

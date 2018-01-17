@@ -1,8 +1,10 @@
 data
-models
-trial-results
+embeddings
+trials
 ontologies/*.nt
 ontologies/*.owl
+*.csv
+*.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -121,9 +121,9 @@ def getDominantAncestor(childParentMap, scores, node):
     else:
         return node
 
-def getSentenceFromKeywords(keywords, verbose=False):
+def getSentenceFromKeywords(keywords, type_heirarchy_filename='type_heirarchy.json', verbose=False):
     # read in type heirarchy information
-    with open('type_heirarchy.json', 'r') as file:
+    with open(type_heirarchy_filename, 'r') as file:
         childParentMap = json.loads(file.read())
     # with open('inverted_type_heirarchy.json', 'r') as file:
     #     parentChildMap = json.loads(file.read())
@@ -162,14 +162,12 @@ def getSentenceFromKeywords(keywords, verbose=False):
         scores.update(scoreNode(allTrees, bestWordsMap, {}, root))
         
     # Print results prettily
-    resultString = prettyPrint(tree, scores, "", "", verbose=verbose)
-    filename = 'results' + str(datetime.datetime.now()) + '.txt'
-    with open(filename, 'w+') as file:
-        file.write(resultString)
+    # resultString = prettyPrint(tree, scores, "", "", verbose=verbose)
+    # filename = 'results' + str(datetime.datetime.now()) + '.txt'
+    # with open(filename, 'w+') as file:
+    #     file.write(resultString)
 
 
-
-    # Largely ignore all work done above and print results from original model
 
     inf = English()
 

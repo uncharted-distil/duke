@@ -1,4 +1,4 @@
-# duke -- Dataset Understanding via Knowledge-graph Entities
+# duke -- Dataset Understanding via Knowledge-graph Embeddings
 
 First, you should download wiki2vec model (English Wikipedia) using a torrent as described on this link:
 

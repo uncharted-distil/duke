@@ -1,0 +1,7 @@
+# exclude development and backed up files...
+backup
+dev
+# exclude data folders...
+data
+darpa_data
+# en_1000_no_stem # you can speed up docker image build when debugging

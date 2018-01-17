@@ -7,12 +7,19 @@ import pandas as pd
 import numpy as np
 
 from dataset_description import DatasetDescriptor
+from SentenceProducer import SentenceProducer
 
 from similarity_functions import (freq_nearest_similarity,
                                   get_class_similarities, w2v_similarity)
 
 from trees import tree_score
 
+    # # EXAMPLE CONFIGURATION
+    # sentenceProducer = SentenceProducer(model_name='/data/duke/models/word2vec/en_1000_no_stem/en.model', 
+    #                     types_filename='/data/duke/models/ontologies/types',
+    #                     type_hierarchy_filename='/data/duke/ontologies/type_hierarchy.json',
+    #                     inverted_type_hierarchy_filename='/data/duke/ontologies/inverted_type_hierarchy.json',
+    #                     verbose=False)
 
 def main(
     dataset='185_baseball',
@@ -36,6 +43,7 @@ def main(
         max_num_samples=max_num_samples,
         verbose=verbose,
         )
+    # return sentenceProducer.produceSentenceFromDataframe(full_df)
 
     print('loaded duke object')
 

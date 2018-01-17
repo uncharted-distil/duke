@@ -11,7 +11,6 @@ def has_relations(class_relations):
     return (len(class_relations['children']) > 0) or (len(class_relations['parents']) > 0)
 
 def get_tree_file_name(ontology_name, prune=True):
-    print('ontology name:', ontology_name)
     return 'class-relationships_{0}{1}.json'.format(ontology_name, '_pruned' if prune else '')
 
 def generate_class_tree_file(ontology_name = 'dbpedia_2016-10', prune=True):

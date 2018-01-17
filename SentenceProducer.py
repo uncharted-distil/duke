@@ -12,9 +12,9 @@ from ScoreAccumulator import ScoreAccumulator
 from SentenceGenerator import SentenceGenerator
 
 from similarity_functions import (freq_nearest_similarity,
-                                  get_type_similarities, w2v_similarity)
-from utils import (get_timestamp, load_dataset, load_model, load_types,
-                   log_top_similarities, timeit, NumpyEncoder)
+                                  get_class_similarities, w2v_similarity)
+from utils import (get_timestamp, load_dataset, load_model, load_ontology,
+                   print_top_similarities, timeit, NumpyEncoder)
 
 class SentenceProducer:
     def __init__(self,
@@ -37,7 +37,7 @@ class SentenceProducer:
         if(self.verbose):
             print('loading types')
         self.types_filename = types_filename
-        self.types = load_types(self.model, types_filename=types_filename)
+        self.types = load_ontology(self.model, types_filename=types_filename)
 
         self.configs = configs
         self.type_hierarchy_filename = type_hierarchy_filename
@@ -52,7 +52,7 @@ class SentenceProducer:
         for source, words in data.items():
             if(self.verbose):
                 print('computing type similarity for ', source)
-            similarities[source] = get_type_similarities(words, self.types, self.model, similarity_func, extra_args)
+            similarities[source] = get_class_similarities(words, self.types, self.model, similarity_func, extra_args)
 
         return similarities
 

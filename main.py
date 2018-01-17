@@ -14,13 +14,6 @@ from similarity_functions import (freq_nearest_similarity,
 
 from trees import tree_score
 
-    # # EXAMPLE CONFIGURATION
-    # sentenceProducer = SentenceProducer(model_name='/data/duke/models/word2vec/en_1000_no_stem/en.model', 
-    #                     types_filename='/data/duke/models/ontologies/types',
-    #                     type_hierarchy_filename='/data/duke/ontologies/type_hierarchy.json',
-    #                     inverted_type_hierarchy_filename='/data/duke/ontologies/inverted_type_hierarchy.json',
-    #                     verbose=False)
-
 def main(
     dataset='185_baseball',
     embedding_path='en_1000_no_stem/en.model',  # wiki2vec model
@@ -43,14 +36,19 @@ def main(
         max_num_samples=max_num_samples,
         verbose=verbose,
         )
-    # return sentenceProducer.produceSentenceFromDataframe(full_df)
 
-    print('loaded duke object')
+    print('initialized duke dataset descriptor \n')
 
     return duke.get_description(dataset=dataset)
-    # print('duke produces description:', description)
 
     
+    # # EXAMPLE CONFIGURATION
+    # sentenceProducer = SentenceProducer(model_name='/data/duke/models/word2vec/en_1000_no_stem/en.model', 
+    #                     types_filename='/data/duke/models/ontologies/types',
+    #                     type_hierarchy_filename='/data/duke/ontologies/type_hierarchy.json',
+    #                     inverted_type_hierarchy_filename='/data/duke/ontologies/inverted_type_hierarchy.json',
+    #                     verbose=False)
+    # return sentenceProducer.produceSentenceFromDataframe(full_df)
 
 if __name__ == '__main__':
     main()

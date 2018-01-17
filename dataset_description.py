@@ -136,7 +136,7 @@ class DatasetDescriptor(object):
 
         top_word = self.classes[np.argmax(final_scores)]
         description = 'This dataset is about {0}.'.format(pluralize(top_word))
-        self.vprint('dataset description:', description)
+        self.vprint('\n\n dataset description:', description, '\n\n')
 
         return(description)
     
@@ -225,11 +225,11 @@ class DatasetDescriptor(object):
             # self.vprint('dropped columns with missing values: {0} \n'.format(list(nan_dropped)), verbose)
         
         out_data = {}
-        self.vprint('normalizing headers')
+        self.vprint('normalizing headers \n')
         out_data['headers'] = self.format_data(headers)
 
         for col in text_df.columns.values:
-            self.vprint('normalizing column:', col)
+            self.vprint('normalizing column: {0}\n'.format(col))
             out_data[self.normalize_words(col, to_list=False)] = self.format_data(text_df[col].values) 
 
         return out_data
@@ -253,7 +253,7 @@ class DatasetDescriptor(object):
     #     for source, words in data.items():
     #         if(self.verbose):
     #             print('computing type similarity for ', source)
-    #         similarities[source] = get_type_similarities(words, self.types, self.embedding, similarity_func, extra_args)
+    #         similarities[source] = get_class_similarities(words, self.types, self.embedding, similarity_func, extra_args)
 
     
 
@@ -265,7 +265,7 @@ class DatasetDescriptor(object):
     #     for source, words in data.items():
     #         if(self.verbose):
     #             print('computing type similarity for ', source)
-    #         similarities[source] = get_type_similarities(words, self.types, self.embedding, similarity_func, extra_args)
+    #         similarities[source] = get_class_similarities(words, self.types, self.embedding, similarity_func, extra_args)
 
     #     return similarities
     

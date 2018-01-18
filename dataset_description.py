@@ -6,6 +6,7 @@ from inflection import underscore, pluralize
 
 import numpy as np
 from gensim.models import Word2Vec
+from DatasetLoader import DatasetLoader
 # from identify_subject import getSentenceFromKeywords
 from similarity_functions import w2v_similarity
 # from utils import (get_timestamp, load_dataset, load_embedding, load_ontology,
@@ -43,11 +44,30 @@ class DatasetDescriptor(object):
         self.source_agg_func = source_agg_func
         self.tree_agg_func = tree_agg_func
 
+        self.dataset_loader = DatasetLoader(self.embedding, self.vprint)
+
         self.reset_scores()
 
         if dataset:
             self.process_dataset(dataset)
+    
+    def get_description(self, dataset=None, reset_scores=False):
 
+        if reset_scores:
+            assert(dataset)  # if resetting scores, a new dataset should be provided
+            self.reset_scores()
+
+        if dataset:
+            self.process_dataset(dataset)
+        
+        tree_scores = {src: self.aggregate_tree_scores(source=src) for src in self.sources()}
+        final_scores = self.aggregate_source_scores(tree_scores)
+
+        top_word = self.classes[np.argmax(final_scores)]
+        description = 'This dataset is about {0}.'.format(pluralize(top_word))
+        self.vprint('\n\n dataset description:', description, '\n\n')
+
+        return(description)
 
 
     def reset_scores(self):
@@ -57,7 +77,7 @@ class DatasetDescriptor(object):
 
 
     def process_dataset(self, dataset):
-        data = self.load_dataset(dataset)
+        data = self.dataset_loader.load_dataset(dataset)
 
         for source, text in data.items():
             self.process_samples(source, text)
@@ -122,53 +142,6 @@ class DatasetDescriptor(object):
         return self.source_agg_func(scores)
 
     
-    def get_description(self, dataset=None, reset_scores=False):
-
-        if reset_scores:
-            assert(dataset)  # if resetting scores, a new dataset should be provided
-            self.reset_scores()
-
-        if dataset:
-            self.process_dataset(dataset)
-        
-        tree_scores = {src: self.aggregate_tree_scores(source=src) for src in self.sources()}
-        final_scores = self.aggregate_source_scores(tree_scores)
-
-        top_word = self.classes[np.argmax(final_scores)]
-        description = 'This dataset is about {0}.'.format(pluralize(top_word))
-        self.vprint('\n\n dataset description:', description, '\n\n')
-
-        return(description)
-    
-
-    @staticmethod
-    def normalize_words(words, to_list=True, replace_chars = {'_': ' ', '-': ' '}):
-        words = underscore(words)  # converts to snake_case
-        for old, new in replace_chars.items(): 
-            words = words.replace(old, new)
-        if to_list:
-            return words.split(' ')
-        else:
-            return words
-
-
-    def in_vocab(self, word_list):
-        if isinstance(word_list, str):
-            word_list = word_list.split(' ')
-        return all([word in self.embedding.wv.vocab for word in word_list])
-
-
-    def remove_out_of_vocab(self, word_groups):
-        if isinstance(word_groups, str):
-            word_groups = word_groups.split(' ')
-        
-        if not isinstance(word_groups, np.ndarray):
-            word_groups = np.array(word_groups)
-        
-        # removes all word lists with any oov words
-        in_vocab = [self.in_vocab(group) for group in word_groups]
-        self.vprint('dropping {0} out of {1} values for having out-of-vocab words \n'.format(len(word_groups) - sum(in_vocab), len(word_groups)))
-        return word_groups[in_vocab]
 
 
     def normalize_class_tree(self, tree):
@@ -198,117 +171,3 @@ class DatasetDescriptor(object):
             tree = json.load(f)
 
         return self.normalize_class_tree(tree)
-
-
-    def load_dataset(self, dataset, drop_nan=True):
-
-        self.vprint('loading dataset')
-        
-        if isinstance(dataset, str):
-            csv_path = 'data/{0}/{0}_dataset/tables/learningData.csv'.format(dataset)
-            dataset = pd.read_csv(csv_path, header=0)  # read csv assuming first line has header text. TODO handle files w/o headers
-        else: 
-            assert(isinstance(dataset, pd.DataFrame))
-        
-        headers = dataset.columns.values
-
-        # TODO confirm that the columns selected can't be cast to a numeric type to avoid numeric strings (e.g. '1')
-        text_df = dataset.select_dtypes(['object'])  # drop non-text rows (pandas strings are of type 'object')
-        # dtype_dropped = get_dropped(headers, text_df.columns.values)
-        # self.vprint('dropped non-text columns: {0} \n'.format(list(dtype_dropped)), verbose)
-
-        if drop_nan: # drop columns if there are any missing values
-            # TODO handle missing values w/o dropping whole column
-            text_df = text_df.dropna(axis=1, how='any')
-            # nan_dropped = get_dropped(headers, text_df.columns.values)
-            # nan_dropped = nan_dropped.difference(dtype_dropped)
-            # self.vprint('dropped columns with missing values: {0} \n'.format(list(nan_dropped)), verbose)
-        
-        out_data = {}
-        self.vprint('normalizing headers \n')
-        out_data['headers'] = self.format_data(headers)
-
-        for col in text_df.columns.values:
-            self.vprint('normalizing column: {0}\n'.format(col))
-            out_data[self.normalize_words(col, to_list=False)] = self.format_data(text_df[col].values) 
-
-        return out_data
-
-
-    def format_data(self, data):
-        word_groups = np.array([self.normalize_words(words) for words in data])  # list of lists of single words
-        return self.remove_out_of_vocab(word_groups)
-
-
-
-
-
-
-        # data = load_dataset(full_df, self.embedding, verbose=self.verbose)
-        # similarities = self.run_trial(data, sim_func, extra_args)
-
-
-    # def get_similarity_score(words, **kwargs):
-    # similarities = {}
-    #     for source, words in data.items():
-    #         if(self.verbose):
-    #             print('computing type similarity for ', source)
-    #         similarities[source] = get_class_similarities(words, self.types, self.embedding, similarity_func, extra_args)
-
-    
-
-    # def run_trial(self, data, similarity_func=w2v_similarity, extra_args=None):
-
-    #     self.vprint('running trial with similarity function: {0}{1}\n'.format(similarity_func.__name__, ', and extra args: {0}'.format(extra_args) if  extra_args else ''))
-        
-    #     similarities = {}
-    #     for source, words in data.items():
-    #         if(self.verbose):
-    #             print('computing type similarity for ', source)
-    #         similarities[source] = get_class_similarities(words, self.types, self.embedding, similarity_func, extra_args)
-
-    #     return similarities
-    
-    # def produceSentenceFromDataframe(self, full_df):
-            # similarities = self.run_trial(data, sim_func, extra_args)
-            
-            # write results of trial to file along with trial config info
-            # record = {
-            #     'embedding': self.embedding_name, 
-            #     'types': self.types, 
-            #     'sim_func': sim_func.__name__, 
-            #     'extra_args': extra_args,
-            #     'similarities': similarities,  # dict mapping column headers to similarity vectors (in the same order as types list)
-            #     }
-            
-            # with open('trials/trial{0}'.format(get_timestamp()), 'w') as f:
-            #     json.dump(record, f, cls=NumpyEncoder)
-
-        # top_n = {}
-        # n = 40
-        # parsedTypes = [''.join(a) for a in self.types]
-        # for header in similarities.keys():
-        #     best = sorted(zip(parsedTypes, similarities[header]), key=lambda x: x[1], reverse=True)[0:10]
-        #     top_n[header] = best
-        #     # print(header)
-        #     if(self.verbose):
-        #         print(best)
-        #         print(header + ": " + getSentenceFromKeywords(best, type_heirarchy_filename=self.type_heirarchy_filename))
-
-        # all_types = []
-        # for key in top_n.keys():
-        #     all_types.extend(top_n[key])
-        # all_types_aggregated = {}
-        # for t_score in all_types:
-        #     all_types_aggregated[t_score[0]] = 0.0
-        # for t_score in all_types:
-        #     all_types_aggregated[t_score[0]] = all_types_aggregated[t_score[0]] + t_score[1] 
-
-        # all_types = []
-        # for key in all_types_aggregated.keys():
-        #     all_types.append((key, all_types_aggregated[key]))
-        
-        # return getSentenceFromKeywords(all_types)
-
-# if __name__ == '__main__':
-#     main()

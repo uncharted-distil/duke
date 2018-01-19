@@ -24,7 +24,6 @@ def main(
     max_num_samples = 2000,
     verbose=True,
     ):
-    csv_path = 'data/{0}/{0}_dataset/tables/learningData.csv'.format(dataset)
 
     duke = DatasetDescriptor(
         # dataset=dataset,
@@ -40,7 +39,7 @@ def main(
 
     print('initialized duke dataset descriptor \n')
 
-    return duke.get_description(dataset=csv_path)
+    return duke.get_description(dataset=dataset)
 
     
     # # EXAMPLE CONFIGURATION
@@ -52,4 +51,4 @@ def main(
     # return sentenceProducer.produceSentenceFromDataframe(full_df)
 
 if __name__ == '__main__':
-    main()
+    main(dataset=sys.argv[1], embedding_path=sys.argv[2])

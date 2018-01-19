@@ -1,18 +1,8 @@
-import sys
-import json
-import time
-from datetime import datetime
-from random import shuffle
-import pandas as pd
 import numpy as np
 
 from dataset_description import DatasetDescriptor
-from SentenceProducer import SentenceProducer
+from similarity_functions import w2v_similarity
 
-from similarity_functions import (freq_nearest_similarity,
-                                  get_class_similarities, w2v_similarity)
-
-from trees import tree_score
 
 def main(
     dataset='185_baseball',
@@ -24,7 +14,6 @@ def main(
     max_num_samples = 2000,
     verbose=True,
     ):
-    csv_path = 'data/{0}/{0}_dataset/tables/learningData.csv'.format(dataset)
 
     duke = DatasetDescriptor(
         # dataset=dataset,
@@ -40,16 +29,8 @@ def main(
 
     print('initialized duke dataset descriptor \n')
 
-    return duke.get_description(dataset=csv_path)
+    return duke.get_description(dataset)
 
-    
-    # # EXAMPLE CONFIGURATION
-    # sentenceProducer = SentenceProducer(model_name='/data/duke/models/word2vec/en_1000_no_stem/en.model', 
-    #                     types_filename='/data/duke/models/ontologies/types',
-    #                     type_hierarchy_filename='/data/duke/ontologies/type_hierarchy.json',
-    #                     inverted_type_hierarchy_filename='/data/duke/ontologies/inverted_type_hierarchy.json',
-    #                     verbose=False)
-    # return sentenceProducer.produceSentenceFromDataframe(full_df)
 
 if __name__ == '__main__':
     main()

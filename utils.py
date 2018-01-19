@@ -55,7 +55,7 @@ def load_dataset(data_frame, model, drop_nan=True, verbose=False):
     for col in text_df.columns.values:
         if(verbose):
             print('normalizing column: ', col)
-        data[normalize_words(col, to_list=False)] = normalize_text(text_df[col].values, model, verbose=verbose) 
+        data[normalize_text(col, to_list=False)] = normalize_text(text_df[col].values, model, verbose=verbose) 
 
     return data
 
@@ -73,7 +73,7 @@ def load_ontology(model, ontology_path='dbpedia_2016-10', prune=True):
     return normalize_classes(relationships, model)
 
 
-def normalize_words(s, replace_chars = {'_': ' ', '-': ' '}, to_list=True):
+def normalize_text(s, replace_chars = {'_': ' ', '-': ' '}, to_list=True):
     s = underscore(s)  # ow need lower
     for old, new in replace_chars.items():
         s = s.replace(old, new)
@@ -103,7 +103,7 @@ def normalize_classes(relationships, model):
 
 
 # def normalize_headers(headers, model):
-#     headers = np.array([normalize_words(h) for h in headers])  # list of lists of single words
+#     headers = np.array([normalize_text(h) for h in headers])  # list of lists of single words
 
 # def normalize_headers(headers, model, verbose=False):
 #     headers = np.array([h.replace('_', ' ').replace('-', ' ').lower().split(' ') for h in headers])  # list of lists of single words
@@ -116,7 +116,7 @@ def normalize_classes(relationships, model):
 
 
 def normalize_text(text, model):
-    text = np.array([normalize_words(t) for t in text])  # list of lists of single words
+    text = np.array([normalize_text(t) for t in text])  # list of lists of single words
 
 # def normalize_text(text, model, verbose=False):
 #     text = np.array([t.replace('_', ' ').replace('-', ' ').lower().split(' ') for t in text])  # list of lists of single words

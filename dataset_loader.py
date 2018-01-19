@@ -11,14 +11,14 @@ class DatasetLoader:
 
 
     @staticmethod
-    def normalize_words(words, to_list=True, replace_chars = {'_': ' ', '-': ' '}):
-        words = underscore(words)  # converts to snake_case
+    def normalize_text(text, to_list=True, replace_chars = {'_': ' ', '-': ' ', '(': '', ')': ''}):
+        text = underscore(text)  # converts to snake_case
         for old, new in replace_chars.items(): 
-            words = words.replace(old, new)
+            text = text.replace(old, new)
         if to_list:
-            return words.split(' ')
+            return text.split(' ')
         else:
-            return words
+            return text
 
 
     @staticmethod
@@ -46,7 +46,7 @@ class DatasetLoader:
 
     
     def format_data(self, data):
-        word_groups = np.array([self.normalize_words(words) for words in data])  # list of lists of single words
+        word_groups = np.array([self.normalize_text(text) for text in data])  # list of lists of single words
         return self.remove_out_of_vocab(word_groups)
 
 
@@ -55,7 +55,13 @@ class DatasetLoader:
         self.vprint('loading dataset')
         
         if isinstance(dataset, str):
-            csv_path = 'data/{0}.csv'.format(dataset)
+            # make sure format is csv
+            if len(dataset.split('.')) > 1:
+                assert dataset[-4:] == '.csv'
+                csv_path = 'data/{0}'.format(dataset)
+            else:
+                csv_path = 'data/{0}.csv'.format(dataset)
+
             dataset = pd.read_csv(csv_path, header=0)  # read csv assuming first line has header text. TODO handle files w/o headers
         else:
             assert isinstance(dataset, pd.DataFrame)
@@ -79,8 +85,8 @@ class DatasetLoader:
         out_data['headers'] = self.format_data(headers)
 
         for col in text_df.columns.values:
-            self.vprint('normalizing column: {0}\n'.format(col))
-            out_data[self.normalize_words(col, to_list=False)] = self.format_data(text_df[col].values) 
+            self.vprint('normalizing column: {0}\n'.format(self.normalize_text(col)))
+            out_data[self.normalize_text(col, to_list=False)] = self.format_data(text_df[col].values) 
 
         return out_data
 

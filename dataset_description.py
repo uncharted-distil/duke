@@ -65,7 +65,10 @@ class DatasetDescriptor():
         if dataset:
             self.process_dataset(dataset)
         
+        self.vprint('aggregating tree scores')
         tree_scores = {src: self.aggregate_tree_scores(source=src) for src in self.sources()}
+        
+        self.vprint('aggregating source scores')
         return self.aggregate_source_scores(tree_scores)
 
     
@@ -85,6 +88,7 @@ class DatasetDescriptor():
 
 
     def process_dataset(self, dataset):
+
         data = self.dataset_loader.load_dataset(dataset)
 
         for source, text in data.items():
@@ -98,7 +102,7 @@ class DatasetDescriptor():
         if self.max_num_samples and len(text) > self.max_num_samples:
             self.vprint('subsampling word list of length {0} to {1}'.format(len(text), self.max_num_samples))
             shuffle(text)  # TODO problem to shuffle in place -- effects outside method? 
-            text = text[:max_num_samples]
+            text = text[:self.max_num_samples]
 
         for words in text:  # TODO vectorize
             try:

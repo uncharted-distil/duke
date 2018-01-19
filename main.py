@@ -1,3 +1,4 @@
+import cProfile as profile
 import numpy as np
 
 from dataset_description import DatasetDescriptor
@@ -29,8 +30,9 @@ def main(
 
     print('initialized duke dataset descriptor \n')
 
-    return duke.get_description(dataset)
+    print(duke.get_description(dataset))
 
 
 if __name__ == '__main__':
     main()
+    # profile.run('main()', sort='time')

@@ -5,8 +5,8 @@ from datetime import datetime
 from inflection import underscore, pluralize
 
 import numpy as np
-from gensim.models import Word2Vec
 from DatasetLoader import DatasetLoader
+from EmbeddingModel import EmbeddingModel
 from SampleProcessor import SampleProcessor
 # from identify_subject import getSentenceFromKeywords
 from similarity_functions import w2v_similarity
@@ -24,7 +24,7 @@ class DatasetDescriptor(object):
         embedding_path='./models/word2vec/en_1000_no_stem/en.model',  # wiki2vec model
         ontology_path='dbpedia_2016-10',
         similarity_func=w2v_similarity,
-        tree_agg_func=np.mean,
+        tree_agg_func=max,
         source_agg_func=lambda scores: np.mean(scores, axis=0),
         max_num_samples=None,
         verbose=False,
@@ -35,7 +35,7 @@ class DatasetDescriptor(object):
         self.max_num_samples = max_num_samples
 
         # load embedding before ontology as embedding is used to remove out of vocab words from the ontology        
-        self.embedding = self.load_embedding(embedding_path)
+        self.embedding = EmbeddingModel(embedding_path)
         self.dataset_loader = DatasetLoader(embedding=self.embedding, vprint=self.vprint)
         self.tree = self.load_ontology(ontology_path)
         self.classes = list(self.tree.keys())
@@ -109,7 +109,7 @@ class DatasetDescriptor(object):
 
     def normalize_class_tree(self, tree):
         # filter out keys with out-of-vocab words -- all words in class name must be in vocab
-        tree = {name: rels for (name, rels) in tree.items() if self.dataset_loader.in_vocab(name)}
+        tree = {name: rels for (name, rels) in tree.items() if self.embedding.in_vocab(name)}
         classes = list(tree.keys())  # filtered class list
         #     log('dropped {0} out of {1} type values for having out-of-vocab words. \n'.format()
 
@@ -120,12 +120,6 @@ class DatasetDescriptor(object):
 
         return tree
 
-
-    def load_embedding(self, embedding_path='./models/word2vec/en_1000_no_stem/en.model'):
-        ''' Load a word2vec embedding from a file in embeddings/ '''
-        self.vprint('loading word2vec embedding model')
-        return Word2Vec.load(embedding_path)
-    
 
     def load_ontology(self, ontology_path='dbpedia_2016-10', prune=True):
         self.vprint('loading class ontology:', ontology_path)

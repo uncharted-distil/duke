@@ -3,7 +3,7 @@ import numpy as np
 
 
 def w2v_similarity(words, classes, model):
-    return np.array([model.wv.n_similarity(words, cl) for cl in classes])/2 + 1/2  # normalize similarity between 0 and 1
+    return np.array([model.n_similarity(words, cl) for cl in classes])/2 + 1/2  # normalize similarity between 0 and 1
 
 
 def freq_nearest_similarity(words, classes, model, extra_args={'n_nearest': 3}):

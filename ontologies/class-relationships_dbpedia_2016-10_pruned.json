@@ -36,7 +36,7 @@
             "artist"
         ],
         "children": [
-            "adult (pornographic) actor",
+            "adult pornographic actor",
             "voice actor"
         ]
     },
@@ -47,10 +47,10 @@
         "children": [
             "clerical administrative region",
             "governmental administrative region",
-            "ancient area of jurisdiction of a person (feudal) or of a governmental body"
+            "ancient area of jurisdiction of a person feudal or of a governmental body"
         ]
     },
-    "adult (pornographic) actor": {
+    "adult pornographic actor": {
         "parents": [
             "actor"
         ],
@@ -376,7 +376,7 @@
             "handball player",
             "high diver",
             "horse rider",
-            "jockey (horse racer)",
+            "jockey horse racer",
             "lacrosse player",
             "martial artist",
             "motorsport racer",
@@ -1328,7 +1328,7 @@
         ],
         "children": []
     },
-    "cultivar (cultivated variety)": {
+    "cultivar cultivated variety": {
         "parents": [
             "plant"
         ],
@@ -1722,7 +1722,7 @@
     },
     "fiefdom": {
         "parents": [
-            "ancient area of jurisdiction of a person (feudal) or of a governmental body"
+            "ancient area of jurisdiction of a person feudal or of a governmental body"
         ],
         "children": []
     },
@@ -2117,7 +2117,7 @@
         ],
         "children": []
     },
-    "ancient area of jurisdiction of a person (feudal) or of a governmental body": {
+    "ancient area of jurisdiction of a person feudal or of a governmental body": {
         "parents": [
             "administrative region"
         ],
@@ -2364,7 +2364,7 @@
             "atoll"
         ]
     },
-    "jockey (horse racer)": {
+    "jockey horse racer": {
         "parents": [
             "athlete"
         ],
@@ -3444,7 +3444,7 @@
         "children": [
             "club moss",
             "conifer",
-            "cultivar (cultivated variety)",
+            "cultivar cultivated variety",
             "cycad",
             "fern",
             "flowering plant",

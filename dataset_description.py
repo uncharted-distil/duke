@@ -6,16 +6,12 @@ from inflection import underscore, pluralize
 
 import numpy as np
 from gensim.models import Word2Vec
-# from identify_subject import getSentenceFromKeywords
 from similarity_functions import w2v_similarity
-# from utils import (get_timestamp, load_dataset, load_embedding, load_ontology,
-#                    log_top_similarities, timeit, NumpyEncoder)
-
 from trees import tree_score
 from ontologies.ontology import get_tree_file_name
 
 
-class DatasetDescriptor(object):
+class DatasetDescriptor():
 
     def __init__(self, 
         dataset=None,
@@ -47,7 +43,6 @@ class DatasetDescriptor(object):
 
         if dataset:
             self.process_dataset(dataset)
-
 
 
     def reset_scores(self):
@@ -108,7 +103,7 @@ class DatasetDescriptor(object):
         score_map = score_map if isinstance(scores, dict) else dict(zip(self.classes, scores))
 
         agg_score_map = tree_score(score_map, self.tree, self.tree_agg_func)
-        return np.array([agg_score_map[cl] for cl in self.classes])
+        return np.array([agg_score_map[cl] for cl in self.classes]) # convert returned score map back to array
 
 
     def sources(self):
@@ -121,8 +116,7 @@ class DatasetDescriptor(object):
         assert(len(scores) == len(self.sources()))
         return self.source_agg_func(scores)
 
-    
-    def get_description(self, dataset=None, reset_scores=False):
+    def get_dataset_class_scores(self, dataset=None, reset_scores=False):
 
         if reset_scores:
             assert(dataset)  # if resetting scores, a new dataset should be provided
@@ -132,8 +126,11 @@ class DatasetDescriptor(object):
             self.process_dataset(dataset)
         
         tree_scores = {src: self.aggregate_tree_scores(source=src) for src in self.sources()}
-        final_scores = self.aggregate_source_scores(tree_scores)
+        return self.aggregate_source_scores(tree_scores)
 
+    
+    def get_description(self, dataset=None, reset_scores=False):
+        final_scores = self.get_dataset_class_scores(dataset, reset_scores)
         top_word = self.classes[np.argmax(final_scores)]
         description = 'This dataset is about {0}.'.format(pluralize(top_word))
         self.vprint('\n\n dataset description:', description, '\n\n')
@@ -191,7 +188,7 @@ class DatasetDescriptor(object):
         return Word2Vec.load('embeddings/{0}'.format(embedding_path))
     
 
-    def load_ontology(self, ontology_path='dbpedia_2016-10', prune=True):
+    def load_ontology(self, ontology_path='dbpedia_2016-10', prune=False):
         self.vprint('loading class ontology:', ontology_path)
         tree_file_name = get_tree_file_name(ontology_path, prune)
         with open('ontologies/{0}'.format(tree_file_name), 'r') as f:  
@@ -205,7 +202,7 @@ class DatasetDescriptor(object):
         self.vprint('loading dataset')
         
         if isinstance(dataset, str):
-            csv_path = 'data/{0}/{0}_dataset/tables/learningData.csv'.format(dataset)
+            csv_path = 'data/{0}.csv'.format(dataset)
             dataset = pd.read_csv(csv_path, header=0)  # read csv assuming first line has header text. TODO handle files w/o headers
         else: 
             assert(isinstance(dataset, pd.DataFrame))

@@ -22,6 +22,7 @@ class DatasetDescriptor(object):
     def __init__(self, 
         dataset=None,
         embedding_path='./models/word2vec/en_1000_no_stem/en.model',  # wiki2vec model
+        embedding=None,
         ontology_path='dbpedia_2016-10',
         similarity_func=w2v_similarity,
         tree_agg_func=max,
@@ -29,13 +30,14 @@ class DatasetDescriptor(object):
         max_num_samples=None,
         verbose=False,
         ):
-    
+
         # print function that works only when obj is init to verbose
         self.vprint = print if verbose else lambda *a, **k: None
         self.max_num_samples = max_num_samples
 
         # load embedding before ontology as embedding is used to remove out of vocab words from the ontology        
-        self.embedding = EmbeddingModel(embedding_path)
+        self.embedding = embedding if embedding else EmbeddingModel(embedding_path)
+
         self.dataset_loader = DatasetLoader(embedding=self.embedding, vprint=self.vprint)
         self.tree = self.load_ontology(ontology_path)
         self.classes = list(self.tree.keys())

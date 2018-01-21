@@ -30,9 +30,10 @@ def main(
 
     print('initialized duke dataset descriptor \n')
 
-    print(duke.get_description(dataset))
+    return duke.get_description(dataset=dataset)
 
 
 if __name__ == '__main__':
-    main()
+    # main()
     # profile.run('main()', sort='time')
+    main(dataset=sys.argv[1], embedding_path=sys.argv[2])

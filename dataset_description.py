@@ -5,6 +5,13 @@ from random import shuffle
 import numpy as np
 from gensim.models import Word2Vec
 from inflection import pluralize
+from DatasetLoader import DatasetLoader
+from EmbeddingModel import EmbeddingModel
+from SampleProcessor import SampleProcessor
+# from identify_subject import getSentenceFromKeywords
+from similarity_functions import w2v_similarity
+# from utils import (get_timestamp, load_dataset, load_embedding, load_ontology,
+#                    log_top_similarities, timeit, NumpyEncoder)
 
 from dataset_loader import DatasetLoader
 from ontologies.ontology import get_tree_file_name
@@ -17,7 +24,8 @@ class DatasetDescriptor():
 
     def __init__(self, 
         dataset=None,
-        embedding_path='en_1000_no_stem/en.model',  # wiki2vec model
+        embedding_path='./models/word2vec/en_1000_no_stem/en.model',  # wiki2vec model
+        embedding=None,
         ontology_path='dbpedia_2016-10',
         similarity_func=w2v_similarity,
         row_agg_func=lambda scores: np.mean(scores, axis=0),
@@ -26,15 +34,18 @@ class DatasetDescriptor():
         max_num_samples=None,
         verbose=False,
         ):
-    
+
         # print function that works only when obj is init to verbose
         self.vprint = print if verbose else lambda *a, **k: None
         self.max_num_samples = max_num_samples
 
         # load embedding before ontology as embedding is used to remove out of vocab words from the ontology        
-        self.embedding = self.load_embedding(embedding_path)
+        self.embedding = embedding if embedding else EmbeddingModel(embedding_path)
+
+        self.dataset_loader = DatasetLoader(embedding=self.embedding, vprint=self.vprint)
         self.tree = self.load_ontology(ontology_path)
         self.classes = list(self.tree.keys())
+
 
         # make multi-word classes into lists before handing to sim func
         classes_lol = [cl.split(' ') if isinstance(cl, str) else cl for cl in self.classes]  
@@ -48,6 +59,7 @@ class DatasetDescriptor():
 
 
         self.dataset_loader = DatasetLoader(self.embedding, verbose)
+        self.sample_processor = SampleProcessor(similarity_func=self.similarity_func, classes=self.classes, vprint=self.vprint)
         self.reset_scores()  
 
         if dataset:
@@ -111,6 +123,8 @@ class DatasetDescriptor():
         for src, word_lol in data.items():
             self.vprint('computing class similarity for data from:', src)
 
+            # self.sim_scores, self.n_samples_seen = self.sample_processor.process_data(data, self.max_num_samples)
+
             if self.max_num_samples and len(word_lol) > self.max_num_samples:
                 self.vprint('subsampling rows from length {0} to {1}'.format(len(word_lol), self.max_num_samples))
                 np.random.shuffle(word_lol)  # TODO minibatches rather than truncate / subsample?
@@ -154,8 +168,8 @@ class DatasetDescriptor():
 
 
     def normalize_class_tree(self, tree):
-        # filter out keys with out-of-vocab words -- all words of the class name must be in vocab
-        tree = {name: rels for (name, rels) in tree.items() if self.in_vocab(name)}
+        # filter out keys with out-of-vocab words -- all words in class name must be in vocab
+        tree = {name: rels for (name, rels) in tree.items() if self.embedding.in_vocab(name)}
         classes = list(tree.keys())  # filtered class list
 
         # remove filtered classes from parent and child lists
@@ -166,10 +180,10 @@ class DatasetDescriptor():
         return tree
 
 
-    def load_embedding(self, embedding_path='en_1000_no_stem/en.model'):
-        ''' Load a word2vec embedding from a file in embeddings/ '''
-        self.vprint('loading word2vec embedding model')
-        return Word2Vec.load('embeddings/{0}'.format(embedding_path))
+    # def load_embedding(self, embedding_path='en_1000_no_stem/en.model'):
+    #     ''' Load a word2vec embedding from a file in embeddings/ '''
+    #     self.vprint('loading word2vec embedding model')
+    #     return Word2Vec.load('embeddings/{0}'.format(embedding_path))
     
 
     def load_ontology(self, ontology_path='dbpedia_2016-10', prune=False):

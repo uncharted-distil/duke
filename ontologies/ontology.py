@@ -1,6 +1,5 @@
 # import owlready2 as owl
 import ontospy
-import os
 import json
 from inflection import underscore
 
@@ -31,8 +30,8 @@ def generate_class_tree_file(ontology_name = 'dbpedia_2016-10', prune=False):
             'children': [to_class_name(c) for c in cl.children()], 
             }
 
-        parents = set([to_class_name(p) for p in cl.parents()])
-        children = set([to_class_name(c) for c in cl.children()])
+        parents = {to_class_name(p) for p in cl.parents()}
+        children = {to_class_name(c) for c in cl.children()}
         all_classes = all_classes.union(parents, children, set([to_class_name(cl)]))
 
     print('pre prune relationships length:', len(relationships.keys()))

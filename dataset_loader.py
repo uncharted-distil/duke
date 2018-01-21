@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from inflection import underscore, pluralize
+from inflection import underscore
 
 
 class DatasetLoader:
@@ -8,6 +8,8 @@ class DatasetLoader:
     def __init__(self, embedding, verbose=False):
         self.vprint = print if verbose else lambda *a, **k: None
         self.embedding = embedding
+
+        self.vocab = set()
 
 
     @staticmethod
@@ -82,12 +84,29 @@ class DatasetLoader:
         
         out_data = {}
         self.vprint('normalizing headers \n')
-        out_data['headers'] = self.format_data(headers)
+        
+        word_lol = self.format_data(headers)
+        out_data['headers'] = word_lol
+        self.add_to_vocab(word_lol)
 
         for col in text_df.columns.values:
-            self.vprint('normalizing column: {0}\n'.format(self.normalize_text(col)))
-            out_data[self.normalize_text(col, to_list=False)] = self.format_data(text_df[col].values) 
+            self.vprint('normalizing column: {0}\n'.format(self.normalize_text(col, to_list=False)))
+            word_lol = self.format_data(text_df[col].values) 
+            out_data[self.normalize_text(col, to_list=False)] = word_lol
+            self.add_to_vocab(word_lol)
+
+        assert self.get_vocab(out_data) == self.vocab
 
         return out_data
+
+
+    def add_to_vocab(self, word_lol):
+        word_list = [w for word_list in word_lol for w in word_list]
+        self.vocab.update(word_list)
+
+
+    def get_vocab(self, data):
+        return set([word for src in data.keys() for group in data[src] for word in group])
+        
 
 

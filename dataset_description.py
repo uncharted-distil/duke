@@ -171,7 +171,7 @@ class DatasetDescriptor():
     def load_embedding(self, embedding_path='en_1000_no_stem/en.model'):
         ''' Load a word2vec embedding from a file in embeddings/ '''
         self.vprint('loading word2vec embedding model')
-        return Word2Vec.load('../duke/{0}'.format(embedding_path))
+        return Word2Vec.load('embeddings/{0}'.format(embedding_path))
     
 
     def load_ontology(self, ontology_path='dbpedia_2016-10', prune=False):

@@ -58,9 +58,9 @@ class DatasetLoader:
             # make sure format is csv
             if len(dataset.split('.')) > 1:
                 assert dataset[-4:] == '.csv'
-                csv_path = 'data/{0}'.format(dataset)
+                csv_path = '{0}'.format(dataset)
             else:
-                csv_path = 'data/{0}.csv'.format(dataset)
+                csv_path = '{0}.csv'.format(dataset)
 
             dataset = pd.read_csv(csv_path, header=0)  # read csv assuming first line has header text. TODO handle files w/o headers
         else:

@@ -29,43 +29,42 @@ class DukeRestListener:
 	# Describe a given dataset
 	def predictFile(self, fileName, sim_threshold):
 
-		start = time.time()		
+            start = time.time()
 
-		dataset=fileName
-    		embedding_path='en_1000_no_stem/en.model'  # wiki2vec model
-    		ontology_path='dbpedia_2016-10'
-    		similarity_func=w2v_similarity
-    		tree_agg_func=np.mean
-    		source_agg_func=lambda scores: np.mean(scores, axis=0),
-    		max_num_samples = 2000
-    		verbose=True
+            dataset=fileName
+            embedding_path='en_1000_no_stem/en.model'  # wiki2vec model
+            ontology_path='dbpedia_2016-10'
+            similarity_func=w2v_similarity
+            tree_agg_func=np.mean
+            source_agg_func=lambda scores: np.mean(scores, axis=0),
+            max_num_samples = 2000
+            verbose=True
 
-    		duke = DatasetDescriptor(
-        		# dataset=dataset,
-        		dataset=None,
-        		embedding_path=embedding_path,
-        		ontology_path=ontology_path,
-        		similarity_func=similarity_func,
-        		tree_agg_func=tree_agg_func,
-        		source_agg_func=source_agg_func,
-        		max_num_samples=max_num_samples,
-        		verbose=verbose,
-        		)
+            duke = DatasetDescriptor(
+                    # dataset=dataset,
+                    dataset=None,
+                    embedding_path=embedding_path,
+                    ontology_path=ontology_path,
+                    similarity_func=similarity_func,
+                    tree_agg_func=tree_agg_func,
+                    source_agg_func=source_agg_func,
+                    max_num_samples=max_num_samples,
+                    verbose=verbose,
+                    )
 
-    		print('initialized duke dataset descriptor \n')
+            print('initialized duke dataset descriptor \n')
 
-		description = duke.get_description(dataset)
+            description = duke.get_description(dataset)
 
-		print(description)
-		
-		print("The whole script took %f seconds to execute"%(time.time()-start))
-		
+            print(description)
 
-		return self.encoder.encode(description)
+            print("The whole script took %f seconds to execute"%(time.time()-start))
+
+            return self.encoder.encode(description)
 
 
 config = configparser.ConfigParser()
-config.read('rest/config.ini')
+config.read('config.ini')
 modelName = config['DEFAULT']['modelName']
         
 listener = DukeRestListener(modelName)

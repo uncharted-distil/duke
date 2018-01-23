@@ -30,12 +30,11 @@ class EmbeddedDataset:
 
 
     def load_dataset(self, dataset, drop_nan=True, reset_data=True):
-        self.vprint('loading dataset')
+        self.vprint('\nloading dataset')
         
         if isinstance(dataset, str):
             dataset = pd.read_csv(dataset, header=0)  # read csv assuming first line has header text. TODO handle files w/o headers
         else:
-            print('dataset:', dataset)
             assert isinstance(dataset, pd.DataFrame)
 
         headers = dataset.columns.values
@@ -43,25 +42,26 @@ class EmbeddedDataset:
         # TODO confirm that the columns selected can't be cast to a numeric type to avoid numeric strings (e.g. '1')
 
         dtype_dropped = get_dropped(headers, text_df.columns.values)
-        self.vprint('dropped non-text columns: {0} \n'.format(list(dtype_dropped)))
+        self.vprint('\ndropped non-text columns: {0}'.format(list(dtype_dropped)))
 
         if drop_nan: # drop columns if there are any missing values
             # TODO handle missing values w/o dropping whole column
             text_df = text_df.dropna(axis=1, how='any')
             nan_dropped = get_dropped(headers, text_df.columns.values)
             nan_dropped = nan_dropped.difference(dtype_dropped)
-            self.vprint('dropped columns with missing values: {0} \n'.format(list(nan_dropped)))
+            if nan_dropped:
+                self.vprint('\ndropped columns with missing values: {0}'.format(list(nan_dropped)))
         
         if not reset_data:
             # TODO implement variant where data is appended instead of overwritten
             raise Exception('not implemented')
             
         self.data = {}
-        self.vprint('normalizing headers \n')
+        self.vprint('\nnormalizing headers')
         self.data['headers'] = self.format_data(headers)
 
         for col in text_df.columns.values:
-            self.vprint('normalizing column: {0}\n'.format(normalize_text(col, to_list=False)))
+            self.vprint('\nnormalizing column: {0}'.format(normalize_text(col, to_list=False)))
             self.data[normalize_text(col, to_list=False)] = self.format_data(text_df[col].values) 
 
         return self.data

@@ -24,7 +24,7 @@ class Embedding:
         
         # removes all word lists with any oov words
         in_vocab = [self.in_vocab(group) for group in word_groups]
-        self.vprint('dropping {0} out of {1} values for having out-of-vocab words \n'.format(len(word_groups) - sum(in_vocab), len(word_groups)))
+        self.vprint('dropping {0} out of {1} values for having out-of-vocab words'.format(len(word_groups) - sum(in_vocab), len(word_groups)))
         return word_groups[in_vocab]
 
 

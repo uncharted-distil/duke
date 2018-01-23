@@ -62,7 +62,7 @@ class DatasetDescriptor():
     def get_dataset_class_scores(self):
 
         if not self.similarity_matrices:
-            self.vprint('\ncomputing similarity matrices\n')
+            self.vprint('computing similarity matrices')
             self.compute_similarity_matrices()
 
         sources = self.sources()

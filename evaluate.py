@@ -1,10 +1,9 @@
 import json
-import os
 
 import numpy as np
 
 from dataset_descriptor import DatasetDescriptor
-from utils import mean_of_rows, path_to_name
+from utils import mean_of_rows
 
 def evaluate(scores, labels):
     scores = scores if isinstance(scores, np.ndarray) else np.array(scores)
@@ -50,7 +49,8 @@ def main(
     print('initialized duke dataset descriptor \n')
 
     scores = duke.get_dataset_class_scores()
-    labels_filename = 'data/{0}_positive_examples.json'.format(path_to_name(dataset_path))
+    dataset_path = dataset_path.split('.')[0]  # remove file extension
+    labels_filename = '{0}_positive_examples.json'.format(dataset_path)
     with open(labels_filename) as f:
         positive_examples = json.load(f)
     

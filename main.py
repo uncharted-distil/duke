@@ -9,7 +9,7 @@ from utils import mean_of_rows
 
 def main(
     dataset_path='data/185_baseball.csv',
-    ontology_path='ontologies/dbpedia_2016-10.nt',
+    tree_path='ontologies/dbpedia_2016-10.nt',
     embedding_path='embeddings/wiki2vec/en.model',
     row_agg_func=mean_of_rows,
     tree_agg_func=np.mean,
@@ -20,7 +20,7 @@ def main(
 
     duke = DatasetDescriptor(
         dataset=dataset_path,
-        ontology=ontology_path,
+        tree=tree_path,
         embedding=embedding_path,
         row_agg_func=row_agg_func,
         tree_agg_func=tree_agg_func,

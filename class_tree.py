@@ -11,18 +11,17 @@ from utils import DASHES_TO_SPACES, REMOVE_PAREN, unit_norm_rows, no_op, path_to
 
 class EmbeddedClassTree():
 
-    def __init__(self, embedding_model, tree_path='ontologies/class-tree_dbpedia_2016-10.json', embed_classes=True, prune=False, verbose=False):
-        
+    def __init__(self, embedding_model, tree_path='ontologies/class-tree_dbpedia_2016-10.json', embed_classes=True, verbose=False):
         self.vprint = print if verbose else no_op
 
         assert isinstance(embedding_model, Embedding)
         self.embedding = embedding_model 
 
-        self.tree = self.load_tree(tree_path, prune)
+        self.tree = self.load_tree(tree_path)
         self.classes = list(self.tree.keys())
         
         if embed_classes:
-            self.embed_classes(self.classes)
+            self.embed_classes()
 
 
     def embed_classes(self, classes=None):
@@ -46,15 +45,9 @@ class EmbeddedClassTree():
         return tree
 
 
-    def load_tree(self, tree_path='dbpedia_2016-10', prune=False):
-        ontology_name = os.path.basename(tree_path)
-        ontology_name = ontology_name.split('.')[0]  # remove any file extensions
-        self.vprint('loading class ontology:', tree_path)
-        
-        tree_file_name = get_tree_file_name(ontology_name, prune)  
-        with open('ontologies/{0}'.format(tree_file_name), 'r') as f:  
-            tree = json.load(f)
-
+    def load_tree(self, tree_path='ontologies/class-tree_dbpedia_2016-10.json'):
+        with open(tree_path, 'r') as tree_file:  
+            tree = json.load(tree_file)
         return self.normalize_class_tree(tree)
 
 

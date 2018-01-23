@@ -1,7 +1,7 @@
 import numpy as np
 from inflection import pluralize
 
-from ontology import EmbeddedClassTree, tree_score
+from class_tree import EmbeddedClassTree, tree_score
 from dataset import EmbeddedDataset
 from embedding import Embedding
 from utils import mean_of_rows, no_op
@@ -11,7 +11,7 @@ class DatasetDescriptor():
 
     def __init__(self, 
         dataset='data/185_baseball.csv',
-        ontology='ontologies/dbpedia_2016-10.nt',
+        tree='ontologies/class-tree_dbpedia_2016-10.json',
         embedding='models/wiki2vec/en.model',
         row_agg_func=mean_of_rows,
         tree_agg_func=np.mean,
@@ -26,7 +26,7 @@ class DatasetDescriptor():
 
         self.embedding = embedding if isinstance(embedding, Embedding) else Embedding(embedding_path=embedding, verbose=verbose)
         self.dataset = dataset if isinstance(dataset, EmbeddedDataset) else EmbeddedDataset(self.embedding, dataset_path=dataset, verbose=verbose)
-        self.tree = ontology if isinstance(ontology, EmbeddedClassTree) else EmbeddedClassTree(self.embedding, tree_path=ontology, verbose=verbose)
+        self.tree = tree if isinstance(tree, EmbeddedClassTree) else EmbeddedClassTree(self.embedding, tree_path=tree, verbose=verbose)
 
         self.row_agg_func = row_agg_func
         self.source_agg_func = source_agg_func

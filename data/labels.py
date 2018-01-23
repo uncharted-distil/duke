@@ -2,7 +2,7 @@ import json
 import pandas as pd
 
 
-def gen_label_stub(ontology_path='ontologies/dbpedia_2016-10.json'):
+def gen_label_stub(ontology_path='ontologies/class-tree_dbpedia_2016-10.json'):
 
     with open('{0}'.format(ontology_path), 'r') as f:  
         tree = json.load(f)

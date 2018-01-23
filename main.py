@@ -4,12 +4,13 @@ import sys
 import numpy as np
 
 from dataset_descriptor import DatasetDescriptor
+from utils import mean_of_rows
 
 
 def main(
-    dataset='185_baseball',
-    embedding_path='en_1000_no_stem/en.model',  # wiki2vec model
-    ontology_path='dbpedia_2016-10',
+    dataset_path='data/185_baseball.csv',
+    ontology_path='ontologies/dbpedia_2016-10.nt',
+    embedding_path='embeddings/wiki2vec/en.model',
     row_agg_func=mean_of_rows,
     tree_agg_func=np.mean,
     source_agg_func=mean_of_rows,
@@ -18,10 +19,10 @@ def main(
     ):
 
     duke = DatasetDescriptor(
-        dataset=dataset,
-        embedding_path=embedding_path,
-        ontology_path=ontology_path,
-        similarity_func=similarity_func,
+        dataset=dataset_path,
+        ontology=ontology_path,
+        embedding=embedding_path,
+        row_agg_func=row_agg_func,
         tree_agg_func=tree_agg_func,
         source_agg_func=source_agg_func,
         max_num_samples=max_num_samples,
@@ -30,7 +31,7 @@ def main(
 
     print('initialized duke dataset descriptor \n')
 
-    return duke.get_description(dataset=dataset)
+    return duke.get_dataset_description()
 
 
 if __name__ == '__main__':

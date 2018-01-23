@@ -17,6 +17,7 @@ class EmbeddedClassTree():
         assert isinstance(embedding_model, Embedding)
         self.embedding = embedding_model 
 
+        self.vprint('loading ontology tree')
         self.tree = self.load_tree(tree_path)
         self.classes = list(self.tree.keys())
         

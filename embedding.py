@@ -11,8 +11,10 @@ class Embedding:
         ''' Load a word2vec embedding from a file '''
         
         self.vprint = print if verbose else no_op
-        self.model = Word2Vec.load(embedding_path)
         self.embed_agg_func = embed_agg_func
+
+        self.vprint('loading word2vec embedding model')    
+        self.model = Word2Vec.load(embedding_path)
 
 
     def remove_out_of_vocab(self, word_groups):

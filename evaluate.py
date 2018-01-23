@@ -1,10 +1,10 @@
 import json
+import os
 
 import numpy as np
 
-from dataset_description import DatasetDescriptor
-from similarity_functions import w2v_similarity
-
+from dataset_descriptor import DatasetDescriptor
+from utils import mean_of_rows, path_to_name
 
 def evaluate(scores, labels):
     scores = scores if isinstance(scores, np.ndarray) else np.array(scores)
@@ -26,21 +26,21 @@ def evaluate(scores, labels):
 
 
 def main(
-    dataset='185_baseball',
-    embedding_path='en_1000_no_stem/en.model',  # wiki2vec model
-    ontology_path='dbpedia_2016-10',
-    similarity_func=w2v_similarity,
+    dataset_path='data/185_baseball.csv',
+    ontology_path='ontologies/dbpedia_2016-10.nt',
+    embedding_path='embeddings/wiki2vec/en.model',
+    row_agg_func=mean_of_rows,
     tree_agg_func=np.mean,
-    source_agg_func=lambda scores: np.mean(scores, axis=0),
-    max_num_samples = 2000,
+    source_agg_func=mean_of_rows,
+    max_num_samples = 1e6,
     verbose=True,
     ):
 
     duke = DatasetDescriptor(
-        dataset=None,
-        embedding_path=embedding_path,
-        ontology_path=ontology_path,
-        similarity_func=similarity_func,
+        dataset=dataset_path,
+        ontology=ontology_path,
+        embedding=embedding_path,
+        row_agg_func=row_agg_func,
         tree_agg_func=tree_agg_func,
         source_agg_func=source_agg_func,
         max_num_samples=max_num_samples,
@@ -49,9 +49,8 @@ def main(
 
     print('initialized duke dataset descriptor \n')
 
-    scores = duke.get_dataset_class_scores(dataset, reset_scores=True)
-
-    labels_filename = 'data/{0}_positive_examples.json'.format(dataset)
+    scores = duke.get_dataset_class_scores()
+    labels_filename = 'data/{0}_positive_examples.json'.format(path_to_name(dataset_path))
     with open(labels_filename) as f:
         positive_examples = json.load(f)
     

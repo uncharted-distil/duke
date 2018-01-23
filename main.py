@@ -1,24 +1,24 @@
 import cProfile as profile
+import sys
+
 import numpy as np
 
-from dataset_description import DatasetDescriptor
-from similarity_functions import w2v_similarity
+from dataset_descriptor import DatasetDescriptor
 
 
 def main(
     dataset='185_baseball',
     embedding_path='en_1000_no_stem/en.model',  # wiki2vec model
     ontology_path='dbpedia_2016-10',
-    similarity_func=w2v_similarity,
+    row_agg_func=mean_of_rows,
     tree_agg_func=np.mean,
-    source_agg_func=lambda scores: np.mean(scores, axis=0),
-    max_num_samples = 2000,
+    source_agg_func=mean_of_rows,
+    max_num_samples = 1e6,
     verbose=True,
     ):
 
     duke = DatasetDescriptor(
-        # dataset=dataset,
-        dataset=None,
+        dataset=dataset,
         embedding_path=embedding_path,
         ontology_path=ontology_path,
         similarity_func=similarity_func,
@@ -34,6 +34,6 @@ def main(
 
 
 if __name__ == '__main__':
-    # main()
+    main()
     # profile.run('main()', sort='time')
-    main(dataset=sys.argv[1], embedding_path=sys.argv[2])
+    # main(dataset=sys.argv[1], embedding_path=sys.argv[2])

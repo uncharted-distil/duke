@@ -1,12 +1,14 @@
 import json
 
 import numpy as np
+import pandas as pd
 
 from dataset_descriptor import DatasetDescriptor
-from utils import mean_of_rows, path_to_name
+from utils import mean_of_rows, path_to_name, get_timestamp
 from embedding import Embedding
 from dataset import EmbeddedDataset
 from class_tree import EmbeddedClassTree
+
 
 def evaluate(scores, labels):
     scores = scores if isinstance(scores, np.ndarray) else np.array(scores)
@@ -21,8 +23,9 @@ def evaluate(scores, labels):
     pos_inds = np.where(labels == 1)[0]
     neg_inds = np.where(labels == -1)[0]
     
-    results['positive'] = np.dot(scores[pos_inds], labels[pos_inds]) / len(pos_inds)
-    results['negative'] = np.dot(scores[neg_inds], labels[neg_inds]) / len(neg_inds)
+    # average scores for negative and positive examples
+    results['avg_positive_score'] = np.dot(scores[pos_inds], labels[pos_inds]) / len(pos_inds)
+    results['avg_negative_score'] = -np.dot(scores[neg_inds], labels[neg_inds]) / len(neg_inds)
     
     return results
 
@@ -35,14 +38,9 @@ def get_labels(dataset_path, classes):
     
     return np.array([1 if cl in positive_examples else -1 for cl in classes])  
 
-def keyval_str(key, val):
-    return '{0}={1}'.format(key, val.__name__ if hasattr(val, '__name__') else str(val))
 
-
-def config_string(model_config, dataset_path):
-    config = {'dataset': path_to_name(dataset_path)}
-    config.update(model_config)
-    return ' '.join([ keyval_str(key, val) for (key, val) in config.items()])
+def func_name_str(func):
+    return func.__name__ if hasattr(func, '__name__') else str(func)
 
 
 # def run_trial(model_config=None, dataset=None, tree=None, embedding=None, verbose=True, max_num_samples=1e6):
@@ -62,7 +60,9 @@ def main(
     verbose=True,
     ):
 
-    trial_results = {}
+    print('\nrunning evaluation trials using datasets:\n', dataset_paths)
+    print('\nand configs:\n', model_configs)
+
 
     embedding = Embedding(embedding_path=embedding_path, verbose=verbose)
     tree = EmbeddedClassTree(embedding, tree_path=tree_path, verbose=verbose)
@@ -74,15 +74,25 @@ def main(
         'verbose': verbose,
     }
 
+    rows = []
     for dat_path in dataset_paths:
         trial_kwargs['dataset'] = EmbeddedDataset(embedding, dat_path, verbose=verbose)
         trial_kwargs['labels'] = get_labels(dat_path, tree.classes)
 
         for config in model_configs:
+            # run trial using config
             trial_kwargs.update(config)
-            trial_results[config_string(config, dat_path)] = run_trial(trial_kwargs)
+            trial_results = run_trial(trial_kwargs)            
 
-    print('\n\nresults from evaluation trials:\n', trial_results, '\n\n')
+            # add config and dataset name to results and append results to rows list
+            trial_results.update({key: func_name_str(val) for (key, val) in config.items()})
+            trial_results.update({'dataset': path_to_name(dat_path)})
+            rows.append(trial_results)
+
+    print('\n\nresults from evaluation trials:\n', rows, '\n\n')
+
+    df = pd.DataFrame(rows)
+    df.to_csv('trials/trial_{0}.csv'.format(get_timestamp()), index=False)
     
 
 if __name__ == '__main__':

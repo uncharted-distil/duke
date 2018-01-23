@@ -17,6 +17,7 @@ class EmbeddedDataset:
         assert isinstance(embedding_model, Embedding)
         self.embedding = embedding_model
 
+        self.vprint('loading dataset:', dataset_path)
         # set self.data by loading the file at the path given
         self.load_dataset(dataset_path)  
         

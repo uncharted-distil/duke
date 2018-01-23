@@ -151,8 +151,9 @@ class DatasetDescriptor():
         if isinstance(scores, dict):
             scores = list(scores.values())                
         assert(len(scores) == len(self.sources()))
-        return self.source_agg_func(scores)
 
+        #return self.source_agg_func(scores)
+        return np.mean(scores, axis=0)
 
     def normalize_class_tree(self, tree):
         # filter out keys with out-of-vocab words -- all words in class name must be in vocab

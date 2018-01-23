@@ -1,12 +1,10 @@
 import json
 import pandas as pd
-from ontologies.ontology import get_tree_file_name
 
 
-def gen_label_stub(ontology_path='dbpedia_2016-10', prune=False):
+def gen_label_stub(ontology_path='ontologies/dbpedia_2016-10.json'):
 
-    tree_file_name = get_tree_file_name(ontology_path, prune)
-    with open('ontologies/{0}'.format(tree_file_name), 'r') as f:  
+    with open('{0}'.format(ontology_path), 'r') as f:  
         tree = json.load(f)
 
     classes = list(tree.keys())
@@ -25,6 +23,7 @@ def fill_labels(dataset_name='185_baseball'):
 def lines_to_json(dataset_name='185_baseball'):
     with open('data/{0}_positive_examples'.format(dataset_name)) as f:
         lines = f.readlines()
+        
     examples = [s.strip() for s in lines]
     with open('data/{0}_positive_examples.json'.format(dataset_name), 'w') as f:
         json.dump(examples, f)

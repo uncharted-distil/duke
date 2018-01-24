@@ -76,25 +76,23 @@ class DatasetDescriptor():
         
         self.vprint('aggregating source scores')
         return self.aggregate_source_scores(tree_scores)
-
     
     def get_dataset_description(self):
-
         final_scores = self.get_dataset_class_scores()
-        indexed_scores = zip(final_scores, range(len(final_scores)))
-        indexed_scores = sorted(indexed_scores, key=itemgetter(1), reverse=True)
-        n=10
-        top_n = indexed_scores[0:n]
-        top_words = [self.tree.classes[index] for (score, index) in top_n]
-        print(top_words)
-        top_word = top_words[0]
-
-        # top_word = self.tree.classes[np.argmax(final_scores)]
+        top_word = self.tree.classes[np.argmax(final_scores)]
         description = 'This dataset is about {0}.'.format(pluralize(top_word))
         self.vprint('\n\n dataset description:', description, '\n\n')
 
         return(description)
         
+
+    def get_top_n_words(self, n):
+        final_scores = self.get_dataset_class_scores()
+        indexed_scores = zip(final_scores, range(len(final_scores)))
+        indexed_scores = sorted(indexed_scores, key=itemgetter(0), reverse=True)
+        top_n = indexed_scores[0:n]
+        top_words = [self.tree.classes[index] for (score, index) in top_n]
+        return top_words
 
     def aggregate_tree_scores(self, scores):
         # convert score to dict that maps class to score if needed

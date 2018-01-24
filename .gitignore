@@ -6,6 +6,7 @@ ontologies/*.nt
 ontologies/*.owl
 *.csv
 *.json
+*.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

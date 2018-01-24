@@ -1,5 +1,6 @@
 import json
 import glob
+import itertools
 
 import numpy as np
 import pandas as pd
@@ -7,7 +8,7 @@ import seaborn as sb
 import matplotlib.pyplot as plt
 
 from dataset_descriptor import DatasetDescriptor
-from utils import mean_of_rows, path_to_name, get_timestamp
+from utils import mean_of_rows, max_of_rows, path_to_name, get_timestamp
 from embedding import Embedding
 from dataset import EmbeddedDataset
 from class_tree import EmbeddedClassTree
@@ -55,7 +56,7 @@ def run_trial(trial_kwargs, labels):
     return evaluate(scores, labels)
 
 
-def main(
+def run_experiment(
     tree_path='ontologies/class-tree_dbpedia_2016-10.json',
     embedding_path='embeddings/wiki2vec/en.model',
     dataset_paths=['data/185_baseball.csv'],
@@ -64,9 +65,15 @@ def main(
     verbose=True,
     ):
 
-    print('\nrunning evaluation trials using datasets:\n', dataset_paths)
-    print('\nand configs:\n', [{key: func_name_str(val) for (key, val) in config.items()} for config in model_configs], '\n\n')
-
+    print('\nrunning evaluation trials using {0} datasets:\n{1}'.format(len(dataset_paths), '\n'.join(dataset_paths)))
+    print('\nand configs:\n{0}\n\n'.format(
+        '\n'.join(
+            [
+                ', '.join(['{0}: {1}'.format(key, func_name_str(val)) for (key, val) in config.items()]) 
+                for config in model_configs
+            ]
+        )
+    ))
 
     embedding = Embedding(embedding_path=embedding_path, verbose=verbose)
     tree = EmbeddedClassTree(embedding, tree_path=tree_path, verbose=verbose)
@@ -82,14 +89,12 @@ def main(
     for dat_path in dataset_paths:
         print('\nloading dataset:', dat_path)
         trial_kwargs['dataset'] = EmbeddedDataset(embedding, dat_path, verbose=verbose)
-        # trial_kwargs['labels'] = get_labels(dat_path, tree.classes)
         labels = get_labels(dat_path, tree.classes)
 
         for config in model_configs:
             print('\nrunning trial with config:', {key: func_name_str(val) for (key, val) in config.items()})
             # run trial using config
             trial_kwargs.update(config)
-            print('trial kwargs:', trial_kwargs)
             trial_results = run_trial(trial_kwargs, labels)            
 
             # add config and dataset name to results and append results to rows list
@@ -106,15 +111,23 @@ def main(
     
 
 def all_labeled_test():
-    model_configs = [
-        {'row_agg_func': mean_of_rows, 'tree_agg_func': np.mean, 'source_agg_func': mean_of_rows},
-        {'row_agg_func': mean_of_rows, 'tree_agg_func': max, 'source_agg_func': mean_of_rows},
-    ]
+
+    agg_func_combs = itertools.product(
+        [mean_of_rows, max_of_rows],  # row agg funcs
+        [np.mean, max],    # tree agg funcs
+        [mean_of_rows, max_of_rows],   # source agg funcs
+    )
+
+    # model_configs = [
+    #     {'row_agg_func': mean_of_rows, 'tree_agg_func': np.mean, 'source_agg_func': mean_of_rows},
+    # ]
+    model_configs = [{'row_agg_func': row, 'tree_agg_func': tree, 'source_agg_func': source} for (row, tree, source) in agg_func_combs]
+    print('model_configs:\n', '\n'.join([str(conf) for conf in model_configs]))
 
     dataset_paths = glob.glob('data/*_positive_examples.json')
     dataset_paths = [path.replace('_positive_examples.json', '.csv') for path in dataset_paths]
 
-    df = main(
+    df = run_experiment(
         dataset_paths=dataset_paths,
         model_configs=model_configs,
         )
@@ -125,6 +138,7 @@ def all_labeled_test():
 def config_to_legend_string(config):
     return ' '.join(['{0}={1}'.format(key.split('_')[0], func_name_str(val).replace('_', ' ')) for (key, val) in config.items()])
 
+
 def get_config_string_col(df):
     # return ['row={0} tree={1} source={2}'.format(
     return ['{0}, {1}, {2}'.format(
@@ -134,7 +148,7 @@ def get_config_string_col(df):
             ) for index, row in df.iterrows()]
 
 
-def plot_results(trial_results=None):
+def plot_results(trial_results=None, n_top=3):
 
     if trial_results is None:
         files = glob.glob('trials/*.csv')
@@ -151,8 +165,8 @@ def plot_results(trial_results=None):
     df['config'] = get_config_string_col(df)
     df['score_gap'] = df['avg_positive_score'] - df['avg_negative_score']
     df['-avg_negative_score'] = - df['avg_negative_score']
-    
 
+    
     fig = plt.figure(figsize=(14, 6))
     grid = plt.GridSpec(1, 3)  # , hspace=0.2, wspace=0.2)
     ax0 = fig.add_subplot(grid[0, 0])
@@ -167,6 +181,6 @@ def plot_results(trial_results=None):
 
 
 if __name__ == '__main__':
-    # all_labeled_test()
-    plot_results()
+    all_labeled_test()
+    # plot_results()
     

@@ -27,6 +27,10 @@ def mean_of_rows(vectors):
     return np.mean(vectors, axis=0)
 
 
+def max_of_rows(vectors):
+    return np.max(vectors, axis=0)
+
+
 def in_vocab(word_list, model):
     if isinstance(word_list, str):
         word_list = word_list.split(' ')
@@ -54,4 +58,4 @@ def timeit(func, args=None):
 
 
 def get_timestamp():
-    return datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S')
+    return datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S')

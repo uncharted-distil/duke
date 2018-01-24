@@ -17,7 +17,6 @@ class EmbeddedDataset:
         assert isinstance(embedding_model, Embedding)
         self.embedding = embedding_model
 
-        self.vprint('loading dataset:', dataset_path)
         # set self.data by loading the file at the path given
         self.load_dataset(dataset_path)  
         
@@ -31,7 +30,8 @@ class EmbeddedDataset:
 
 
     def load_dataset(self, dataset, drop_nan=True, reset_data=True):
-        self.vprint('\nloading dataset')
+        
+        self.vprint('loading dataset {0}'.format(dataset if isinstance(dataset, str) else 'from pandas DataFrame'))
         
         if isinstance(dataset, str):
             dataset = pd.read_csv(dataset, header=0)  # read csv assuming first line has header text. TODO handle files w/o headers

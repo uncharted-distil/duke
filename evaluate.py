@@ -1,17 +1,17 @@
-import json
 import glob
 import itertools
+import json
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sb
-import matplotlib.pyplot as plt
 
-from dataset_descriptor import DatasetDescriptor
-from utils import mean_of_rows, max_of_rows, path_to_name, get_timestamp
-from embedding import Embedding
-from dataset import EmbeddedDataset
 from class_tree import EmbeddedClassTree
+from dataset import EmbeddedDataset
+from dataset_descriptor import DatasetDescriptor
+from embedding import Embedding
+from utils import get_timestamp, max_of_rows, mean_of_rows, path_to_name
 
 
 def evaluate(scores, labels):
@@ -49,7 +49,6 @@ def func_name_str(func):
     return func.__name__ if hasattr(func, '__name__') else str(func)
 
 
-# def run_trial(model_config=None, dataset=None, tree=None, embedding=None, verbose=True, max_num_samples=1e6):
 def run_trial(trial_kwargs, labels):
     duke = DatasetDescriptor(**trial_kwargs)
     scores = duke.get_dataset_class_scores()
@@ -66,7 +65,8 @@ def run_experiment(
     ):
 
     print('\nrunning evaluation trials using {0} datasets:\n{1}'.format(len(dataset_paths), '\n'.join(dataset_paths)))
-    print('\nand configs:\n{0}\n\n'.format(
+    print('\nand {0} configs:\n{1}\n\n'.format(
+        len(model_configs),
         '\n'.join(
             [
                 ', '.join(['{0}: {1}'.format(key, func_name_str(val)) for (key, val) in config.items()]) 
@@ -102,7 +102,7 @@ def run_experiment(
             trial_results.update({'dataset': path_to_name(dat_path)})
             rows.append(trial_results)
 
-    print('\n\nresults from evaluation trials:\n', rows, '\n\n')
+    # print('\n\nresults from evaluation trials:\n', rows, '\n\n')
 
     df = pd.DataFrame(rows)
     df.to_csv('trials/trial_{0}.csv'.format(get_timestamp()), index=False)
@@ -118,10 +118,12 @@ def all_labeled_test():
         [mean_of_rows, max_of_rows],   # source agg funcs
     )
 
+    # create dict list of all func combinations
+    model_configs = [{'row_agg_func': row, 'tree_agg_func': tree, 'source_agg_func': source} for (row, tree, source) in agg_func_combs]
+    ## manually set config list
     # model_configs = [
     #     {'row_agg_func': mean_of_rows, 'tree_agg_func': np.mean, 'source_agg_func': mean_of_rows},
     # ]
-    model_configs = [{'row_agg_func': row, 'tree_agg_func': tree, 'source_agg_func': source} for (row, tree, source) in agg_func_combs]
 
     dataset_paths = glob.glob('data/*_positive_examples.json')
     dataset_paths = [path.replace('_positive_examples.json', '.csv') for path in dataset_paths]
@@ -147,7 +149,7 @@ def get_config_string_col(df):
             ) for index, row in df.iterrows()]
 
 
-def plot_results(trial_results=None, n_top=3):
+def plot_results(trial_results=None, n_top=5):
 
     if trial_results is None:
         files = glob.glob('trials/*.csv')
@@ -161,11 +163,23 @@ def plot_results(trial_results=None, n_top=3):
         assert isinstance(trial_results, pd.DataFrame)
         df = trial_results
 
+    print('\npost-processing data')
     df['config'] = get_config_string_col(df)
     df['score_gap'] = df['avg_positive_score'] - df['avg_negative_score']
     df['-avg_negative_score'] = - df['avg_negative_score']
 
-    
+    config_score_map = df.groupby('config')['score_gap'].mean()     
+    config_strings = np.array(list(config_score_map.keys()))
+    config_scores = config_score_map.values
+    sort_inds = np.argsort(config_scores)[::-1]
+    top_scores = config_scores[sort_inds][:n_top]
+    top_configs = config_strings[sort_inds][:n_top]
+    print('\n\ntop {0} configs, scores:\n{1}\n\n'.format(
+        n_top,
+        '\n'.join([str(x) for x in list(zip(top_configs, top_scores))])
+        ))
+
+    print('plotting config scores\n')
     fig = plt.figure(figsize=(14, 6))
     grid = plt.GridSpec(1, 3)  # , hspace=0.2, wspace=0.2)
     ax0 = fig.add_subplot(grid[0, 0])
@@ -182,4 +196,3 @@ def plot_results(trial_results=None, n_top=3):
 if __name__ == '__main__':
     all_labeled_test()
     # plot_results()
-    

@@ -39,6 +39,7 @@ class DatasetDescriptor():
     def classes(self):
         return self.tree.classes
 
+    @property
     def sources(self):
         return list(self.similarity_matrices.keys())
     
@@ -66,7 +67,7 @@ class DatasetDescriptor():
             self.vprint('computing similarity matrices')
             self.compute_similarity_matrices()
 
-        sources = self.sources()
+        sources = self.sources
 
         self.vprint('aggregating row scores')
         sim_scores = {src: self.row_agg_func(self.similarity_matrices[src]) for src in sources}
@@ -106,7 +107,7 @@ class DatasetDescriptor():
 
 
     def aggregate_source_scores(self, scores):
-        assert len(scores) == len(self.sources())
+        assert len(scores) == len(self.sources)
         if isinstance(scores, dict):
             scores = list(scores.values())                
         return self.source_agg_func(scores)

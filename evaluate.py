@@ -1,7 +1,10 @@
 import json
+import glob
 
 import numpy as np
 import pandas as pd
+import seaborn as sb
+import matplotlib.pyplot as plt
 
 from dataset_descriptor import DatasetDescriptor
 from utils import mean_of_rows, path_to_name, get_timestamp
@@ -25,7 +28,9 @@ def evaluate(scores, labels):
     
     # average scores for negative and positive examples
     results['avg_positive_score'] = np.dot(scores[pos_inds], labels[pos_inds]) / len(pos_inds)
-    results['avg_negative_score'] = -np.dot(scores[neg_inds], labels[neg_inds]) / len(neg_inds)
+    results['avg_negative_score'] = np.dot(scores[neg_inds], labels[neg_inds]) / len(neg_inds)
+    results['n_positive_samples'] = len(pos_inds)
+    results['n_negative_samples'] = len(neg_inds)
     
     return results
 
@@ -44,8 +49,7 @@ def func_name_str(func):
 
 
 # def run_trial(model_config=None, dataset=None, tree=None, embedding=None, verbose=True, max_num_samples=1e6):
-def run_trial(trial_kwargs):
-    labels = trial_kwargs.pop('labels')
+def run_trial(trial_kwargs, labels):
     duke = DatasetDescriptor(**trial_kwargs)
     scores = duke.get_dataset_class_scores()
     return evaluate(scores, labels)
@@ -61,7 +65,7 @@ def main(
     ):
 
     print('\nrunning evaluation trials using datasets:\n', dataset_paths)
-    print('\nand configs:\n', model_configs)
+    print('\nand configs:\n', [{key: func_name_str(val) for (key, val) in config.items()} for config in model_configs], '\n\n')
 
 
     embedding = Embedding(embedding_path=embedding_path, verbose=verbose)
@@ -76,13 +80,17 @@ def main(
 
     rows = []
     for dat_path in dataset_paths:
+        print('\nloading dataset:', dat_path)
         trial_kwargs['dataset'] = EmbeddedDataset(embedding, dat_path, verbose=verbose)
-        trial_kwargs['labels'] = get_labels(dat_path, tree.classes)
+        # trial_kwargs['labels'] = get_labels(dat_path, tree.classes)
+        labels = get_labels(dat_path, tree.classes)
 
         for config in model_configs:
+            print('\nrunning trial with config:', {key: func_name_str(val) for (key, val) in config.items()})
             # run trial using config
             trial_kwargs.update(config)
-            trial_results = run_trial(trial_kwargs)            
+            print('trial kwargs:', trial_kwargs)
+            trial_results = run_trial(trial_kwargs, labels)            
 
             # add config and dataset name to results and append results to rows list
             trial_results.update({key: func_name_str(val) for (key, val) in config.items()})
@@ -93,7 +101,72 @@ def main(
 
     df = pd.DataFrame(rows)
     df.to_csv('trials/trial_{0}.csv'.format(get_timestamp()), index=False)
+
+    return df
     
 
+def all_labeled_test():
+    model_configs = [
+        {'row_agg_func': mean_of_rows, 'tree_agg_func': np.mean, 'source_agg_func': mean_of_rows},
+        {'row_agg_func': mean_of_rows, 'tree_agg_func': max, 'source_agg_func': mean_of_rows},
+    ]
+
+    dataset_paths = glob.glob('data/*_positive_examples.json')
+    dataset_paths = [path.replace('_positive_examples.json', '.csv') for path in dataset_paths]
+
+    df = main(
+        dataset_paths=dataset_paths,
+        model_configs=model_configs,
+        )
+
+    plot_results(df)
+    
+
+def config_to_legend_string(config):
+    return ' '.join(['{0}={1}'.format(key.split('_')[0], func_name_str(val).replace('_', ' ')) for (key, val) in config.items()])
+
+def get_config_string_col(df):
+    # return ['row={0} tree={1} source={2}'.format(
+    return ['{0}, {1}, {2}'.format(
+            func_name_str(row['row_agg_func']).split('_')[0],
+            func_name_str(row['tree_agg_func']).split('_')[0],
+            func_name_str(row['source_agg_func']).split('_')[0],
+            ) for index, row in df.iterrows()]
+
+
+def plot_results(trial_results=None):
+
+    if trial_results is None:
+        files = glob.glob('trials/*.csv')
+        most_recent = sorted(files)[-1]  # assumes timestamp file suffix
+        df = pd.read_csv(most_recent)
+
+    elif isinstance(trial_results, str):
+        df = pd.read_csv(trial_results)
+        
+    else:
+        assert isinstance(trial_results, pd.DataFrame)
+        df = trial_results
+
+    df['config'] = get_config_string_col(df)
+    df['score_gap'] = df['avg_positive_score'] - df['avg_negative_score']
+    df['-avg_negative_score'] = - df['avg_negative_score']
+    
+
+    fig = plt.figure(figsize=(14, 6))
+    grid = plt.GridSpec(1, 3)  # , hspace=0.2, wspace=0.2)
+    ax0 = fig.add_subplot(grid[0, 0])
+    ax1 = fig.add_subplot(grid[0, 1], sharey=ax0)
+    ax2 = fig.add_subplot(grid[0, 2], sharey=ax0)
+
+    sb.barplot(x='config', y='score_gap', data=df, ax=ax0)
+    sb.barplot(x='config', y='avg_positive_score', data=df, ax=ax1)
+    sb.barplot(x='config', y='-avg_negative_score', data=df, ax=ax2)
+
+    plt.savefig('plots/scores_{0}.png'.format(get_timestamp()))
+
+
 if __name__ == '__main__':
-    main()
+    # all_labeled_test()
+    plot_results()
+    

@@ -1,11 +1,14 @@
+data
 data/*.csv
 data/*.json
 embeddings
 trials
+plots
 ontologies/*.nt
 ontologies/*.owl
 *.csv
 *.json
+*.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

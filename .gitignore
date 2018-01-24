@@ -2,6 +2,7 @@ data/*.csv
 data/*.json
 embeddings
 trials
+plots
 ontologies/*.nt
 ontologies/*.owl
 *.csv

@@ -1,4 +1,5 @@
 import numpy as np
+from operator import itemgetter
 from inflection import pluralize
 
 from class_tree import EmbeddedClassTree, tree_score
@@ -80,7 +81,15 @@ class DatasetDescriptor():
     def get_dataset_description(self):
 
         final_scores = self.get_dataset_class_scores()
-        top_word = self.tree.classes[np.argmax(final_scores)]
+        indexed_scores = zip(final_scores, range(len(final_scores)))
+        indexed_scores = sorted(indexed_scores, key=itemgetter(1), reverse=True)
+        n=10
+        top_n = indexed_scores[0:n]
+        top_words = [self.tree.classes[index] for (score, index) in top_n]
+        print(top_words)
+        top_word = top_words[0]
+
+        # top_word = self.tree.classes[np.argmax(final_scores)]
         description = 'This dataset is about {0}.'.format(pluralize(top_word))
         self.vprint('\n\n dataset description:', description, '\n\n')
 

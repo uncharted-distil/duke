@@ -1,4 +1,5 @@
 import json
+import glob
 
 import numpy as np
 import pandas as pd
@@ -44,8 +45,7 @@ def func_name_str(func):
 
 
 # def run_trial(model_config=None, dataset=None, tree=None, embedding=None, verbose=True, max_num_samples=1e6):
-def run_trial(trial_kwargs):
-    labels = trial_kwargs.pop('labels')
+def run_trial(trial_kwargs, labels):
     duke = DatasetDescriptor(**trial_kwargs)
     scores = duke.get_dataset_class_scores()
     return evaluate(scores, labels)
@@ -61,7 +61,7 @@ def main(
     ):
 
     print('\nrunning evaluation trials using datasets:\n', dataset_paths)
-    print('\nand configs:\n', model_configs)
+    print('and configs:', [{key: func_name_str(val) for (key, val) in config.items()} for config in model_configs])
 
 
     embedding = Embedding(embedding_path=embedding_path, verbose=verbose)
@@ -76,13 +76,17 @@ def main(
 
     rows = []
     for dat_path in dataset_paths:
+        print('\nloading dataset:', dat_path)
         trial_kwargs['dataset'] = EmbeddedDataset(embedding, dat_path, verbose=verbose)
-        trial_kwargs['labels'] = get_labels(dat_path, tree.classes)
+        # trial_kwargs['labels'] = get_labels(dat_path, tree.classes)
+        labels = get_labels(dat_path, tree.classes)
 
         for config in model_configs:
+            print('\nrunning trial with config:', {key: func_name_str(val) for (key, val) in config.items()})
             # run trial using config
             trial_kwargs.update(config)
-            trial_results = run_trial(trial_kwargs)            
+            print('trial kwargs:', trial_kwargs)
+            trial_results = run_trial(trial_kwargs, labels)            
 
             # add config and dataset name to results and append results to rows list
             trial_results.update({key: func_name_str(val) for (key, val) in config.items()})
@@ -95,5 +99,20 @@ def main(
     df.to_csv('trials/trial_{0}.csv'.format(get_timestamp()), index=False)
     
 
+def all_labeled_test():
+    model_configs = [
+        {'row_agg_func': mean_of_rows, 'tree_agg_func': np.mean, 'source_agg_func': mean_of_rows},
+        {'row_agg_func': mean_of_rows, 'tree_agg_func': max, 'source_agg_func': mean_of_rows},
+    ]
+
+    dataset_paths = glob.glob('data/*_positive_examples.json')
+    dataset_paths = [path.replace('_positive_examples.json', '.csv') for path in dataset_paths]
+
+    main(
+        dataset_paths=dataset_paths,
+        model_configs=model_configs,
+        )
+
+
 if __name__ == '__main__':
-    main()
+    all_labeled_test()

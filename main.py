@@ -2,7 +2,7 @@ import cProfile as profile
 import sys
 
 import numpy as np
-
+from agg_functions import *
 from dataset_descriptor import DatasetDescriptor
 from utils import mean_of_rows
 
@@ -12,7 +12,7 @@ def main(
     tree_path='ontologies/class-tree_dbpedia_2016-10.json',
     embedding_path='embeddings/wiki2vec/en.model',
     row_agg_func=mean_of_rows,
-    tree_agg_func=np.mean,
+    tree_agg_func=parent_children_funcs(np.mean, max),
     source_agg_func=mean_of_rows,
     max_num_samples = 1e6,
     verbose=True,

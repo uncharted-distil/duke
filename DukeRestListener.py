@@ -53,7 +53,7 @@ class DukeRestListener:
 
             print('initialized duke dataset descriptor \n')
 
-            description = duke.get_description(dataset)
+            description = duke.get_dataset_description()
 
             print(description)
 

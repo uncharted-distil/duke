@@ -17,7 +17,7 @@ def parent_children_funcs(parent, children, prep=null_prep):
     def custom_agg(vector):
         vector = prep(vector)
         if len(vector) > 1:
-            return parent([vector[0],children(vector[1:])])
+            return parent([vector[0], children(vector[1:])])
         else:
             return vector[0]
     return custom_agg

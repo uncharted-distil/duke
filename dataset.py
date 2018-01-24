@@ -7,7 +7,7 @@ from embedding import Embedding
 
 class EmbeddedDataset:
 
-    def __init__(self, embedding_model, dataset_path='data/185_baseball.csv', max_num_samples=1e5, embed_dataset=True, verbose=False):
+    def __init__(self, embedding_model, dataset_path='data/185_baseball.csv', columns=None, max_num_samples=1e5, embed_dataset=True, verbose=False):
         
         self.data_vectors = {}
         self.max_num_samples=max_num_samples
@@ -30,7 +30,7 @@ class EmbeddedDataset:
         return self.embedding.remove_out_of_vocab(word_groups)
 
 
-    def load_dataset(self, dataset, drop_nan=True, reset_data=True):
+    def load_dataset(self, dataset, columns=None, drop_nan=True, reset_data=True):
         self.vprint('\nloading dataset')
         
         if isinstance(dataset, str):
@@ -39,7 +39,10 @@ class EmbeddedDataset:
             assert isinstance(dataset, pd.DataFrame)
 
         headers = dataset.columns.values
-        text_df = dataset.select_dtypes(['object'])  # drop non-text rows (pandas strings are of type 'object')
+        if columns:
+            text_df = dataset[columns]
+        else:
+            text_df = dataset.select_dtypes(['object'])  # drop non-text rows (pandas strings are of type 'object')
         # TODO confirm that the columns selected can't be cast to a numeric type to avoid numeric strings (e.g. '1')
 
         dtype_dropped = get_dropped(headers, text_df.columns.values)

@@ -12,6 +12,7 @@ class DatasetDescriptor():
 
     def __init__(self, 
         dataset='data/185_baseball.csv',
+        columns=None,
         tree='ontologies/class-tree_dbpedia_2016-10.json',
         embedding='models/wiki2vec/en.model',
         row_agg_func=mean_of_rows,
@@ -26,7 +27,7 @@ class DatasetDescriptor():
         self.max_num_samples = max_num_samples
 
         self.embedding = embedding if isinstance(embedding, Embedding) else Embedding(embedding_path=embedding, verbose=verbose)
-        self.dataset = dataset if isinstance(dataset, EmbeddedDataset) else EmbeddedDataset(self.embedding, dataset_path=dataset, verbose=verbose)
+        self.dataset = dataset if isinstance(dataset, EmbeddedDataset) else EmbeddedDataset(self.embedding, columns=columns, dataset_path=dataset, verbose=verbose)
         self.tree = tree if isinstance(tree, EmbeddedClassTree) else EmbeddedClassTree(self.embedding, tree_path=tree, verbose=verbose)
 
         self.row_agg_func = row_agg_func

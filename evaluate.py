@@ -27,6 +27,8 @@ def evaluate(scores, labels):
     # average scores for negative and positive examples
     results['avg_positive_score'] = np.dot(scores[pos_inds], labels[pos_inds]) / len(pos_inds)
     results['avg_negative_score'] = -np.dot(scores[neg_inds], labels[neg_inds]) / len(neg_inds)
+    results['n_positive_samples'] = len(pos_inds)
+    results['n_negative_samples'] = len(neg_inds)
     
     return results
 

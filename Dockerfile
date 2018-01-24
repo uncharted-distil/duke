@@ -41,6 +41,8 @@ RUN pip3 --no-cache-dir install \
         gensim \
         flask \
         requests \
+        ontospy \
+        inflection \
         && \
     python3 -m ipykernel.kernelspec
     

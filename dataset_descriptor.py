@@ -12,6 +12,7 @@ class DatasetDescriptor():
 
     def __init__(self, 
         dataset='data/185_baseball.csv',
+        columns=None,
         tree='ontologies/class-tree_dbpedia_2016-10.json',
         embedding='models/wiki2vec/en.model',
         row_agg_func=mean_of_rows,
@@ -26,7 +27,7 @@ class DatasetDescriptor():
         self.max_num_samples = max_num_samples
 
         self.embedding = embedding if isinstance(embedding, Embedding) else Embedding(embedding_path=embedding, verbose=verbose)
-        self.dataset = dataset if isinstance(dataset, EmbeddedDataset) else EmbeddedDataset(self.embedding, dataset_path=dataset, verbose=verbose)
+        self.dataset = dataset if isinstance(dataset, EmbeddedDataset) else EmbeddedDataset(self.embedding, columns=columns, dataset_path=dataset, verbose=verbose)
         self.tree = tree if isinstance(tree, EmbeddedClassTree) else EmbeddedClassTree(self.embedding, tree_path=tree, verbose=verbose)
 
         self.row_agg_func = row_agg_func
@@ -77,23 +78,23 @@ class DatasetDescriptor():
         
         self.vprint('aggregating source scores')
         return self.aggregate_source_scores(tree_scores)
-
     
-    def get_dataset_description(self, n_keep=10):
-
+    def get_dataset_description(self):
         final_scores = self.get_dataset_class_scores()
-        
-        # top_word = self.tree.classes[np.argmax(final_scores)]
-        sort_inds = np.argsort(final_scores)[::-1]
-        top_words = self.tree.classes[sort_inds[:n_keep]]
-        self.vprint('top {0} words:'.format(n_keep), top_words)
-        top_word = top_words[0]
-
+        top_word = self.tree.classes[np.argmax(final_scores)]
         description = 'This dataset is about {0}.'.format(pluralize(top_word))
         self.vprint('\n\n dataset description:', description, '\n\n')
 
         return(description)
         
+
+    def get_top_n_words(self, n):
+        final_scores = self.get_dataset_class_scores()
+        indexed_scores = zip(final_scores, range(len(final_scores)))
+        indexed_scores = sorted(indexed_scores, key=itemgetter(0), reverse=True)
+        top_n = indexed_scores[0:n]
+        top_words = [self.tree.classes[index] for (score, index) in top_n]
+        return top_words
 
     def aggregate_tree_scores(self, scores):
         # convert score to dict that maps class to score if needed

@@ -122,7 +122,6 @@ def all_labeled_test():
     #     {'row_agg_func': mean_of_rows, 'tree_agg_func': np.mean, 'source_agg_func': mean_of_rows},
     # ]
     model_configs = [{'row_agg_func': row, 'tree_agg_func': tree, 'source_agg_func': source} for (row, tree, source) in agg_func_combs]
-    print('model_configs:\n', '\n'.join([str(conf) for conf in model_configs]))
 
     dataset_paths = glob.glob('data/*_positive_examples.json')
     dataset_paths = [path.replace('_positive_examples.json', '.csv') for path in dataset_paths]

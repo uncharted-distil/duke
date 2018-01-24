@@ -65,7 +65,12 @@ class EmbeddedDataset:
 
         for col in text_df.columns.values:
             self.vprint('\nnormalizing column: {0}'.format(normalize_text(col, to_list=False)))
-            self.data[normalize_text(col, to_list=False)] = self.format_data(text_df[col].values) 
+            formatted_data = self.format_data(text_df[col].values) 
+            print('formatted data type: ', type(formatted_data))
+            if len(formatted_data) > 0:  # if not all values were removed for being out of vocab, add col to data
+                self.data[normalize_text(col, to_list=False)] = formatted_data
+            else:
+                self.vprint('\nwarning: all rows removed by formatting (out of vocab?) in column', col, '\n')
 
         return self.data
 

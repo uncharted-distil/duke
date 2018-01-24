@@ -19,7 +19,7 @@ class EmbeddedDataset:
 
         self.vprint('loading dataset:', dataset_path)
         # set self.data by loading the file at the path given
-        self.load_dataset(dataset_path)  
+        self.load_dataset(dataset_path, columns=columns)  
         
         if embed_dataset:
             self.embed_dataset()

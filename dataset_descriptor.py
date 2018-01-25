@@ -69,15 +69,16 @@ class DatasetDescriptor():
             self.compute_similarity_matrices()
 
         sources = self.sources
+        self.stddev = np.mean([np.mean(np.std(self.similarity_matrices[src], axis=0)) for src in sources])
 
         self.vprint('aggregating row scores')
-        sim_scores = {src: self.row_agg_func(self.similarity_matrices[src]) for src in sources}
+        sim_scores = {src: self.row_agg_func(self.similarity_matrices[src], self.stddev) for src in sources}
         
         self.vprint('aggregating tree scores')
         tree_scores = {src: self.aggregate_tree_scores(sim_scores[src]) for src in sources}
         
         self.vprint('aggregating source scores')
-        return self.aggregate_source_scores(tree_scores)
+        return self.aggregate_source_scores(tree_scores), self.stddev
     
     def get_dataset_description(self):
         final_scores = self.get_dataset_class_scores()
@@ -89,12 +90,12 @@ class DatasetDescriptor():
         
 
     def get_top_n_words(self, n):
-        final_scores = self.get_dataset_class_scores()
+        final_scores, stddev = self.get_dataset_class_scores()
         indexed_scores = zip(final_scores, range(len(final_scores)))
         indexed_scores = sorted(indexed_scores, key=itemgetter(0), reverse=True)
         top_n = indexed_scores[0:n]
         top_words = [self.tree.classes[index] for (score, index) in top_n]
-        return top_words
+        return top_words, stddev
 
     def aggregate_tree_scores(self, scores):
         # convert score to dict that maps class to score if needed
@@ -111,4 +112,4 @@ class DatasetDescriptor():
         assert len(scores) == len(self.sources)
         if isinstance(scores, dict):
             scores = list(scores.values())                
-        return self.source_agg_func(scores)
+        return self.source_agg_func(scores, self.stddev)

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from dataset_descriptor import DatasetDescriptor
-from utils import mean_of_rows, path_to_name, get_timestamp
+from utils import mean_of_rows, path_to_name, get_timestamp, max_of_rows
 from agg_functions import *
 from embedding import Embedding
 from dataset import EmbeddedDataset
@@ -57,20 +57,21 @@ def get_top_words(trial_kwargs):
 
 
 def main(
-    tree_path='ontologies/class-tree_dbpedia_2016-10.json',
-    embedding_path='models/word2vec/en_1000_no_stem/en.model',
+    tree_path='/data/duke/ontologies/class-relationships_dbpedia_2016-10.json',
+    embedding_path='/data/duke/models/word2vec/en_1000_no_stem/en.model',
     dataset_paths=['data/185_baseball.csv'],
     model_configs=[{'row_agg_func': mean_of_rows, 'tree_agg_func': np.mean, 'source_agg_func': mean_of_rows}],
     max_num_samples=1e6,
     verbose=True,
     ):
 
-    funcs = build_combo_funcs()
-    model_labels = combo_func_labels()
-    model_configs = [{'row_agg_func': mean_of_rows, 'tree_agg_func': func, 'source_agg_func': mean_of_rows} for func in funcs]
+    funcs = [parent_children_funcs(max, np.mean)]
+    model_labels = ['max+mean']
+    row_source_agg = build_threshold_mean_max(0.032)
+    model_configs = [{'row_agg_func': row_source_agg, 'tree_agg_func': func, 'source_agg_func': row_source_agg} for func in funcs]
 
-    root_string = 'data/LL0_{0}/LL0_{0}_dataset/tables/learningData.csv'
-    files = ['49_heart_c', '455_cars', '42_soybean', '31_credit_g', '1100_popularkids', '511_plasma_retinol']
+    root_string = '/data/duke/data/LL0_{0}/LL0_{0}_dataset/tables/learningData.csv'
+    files = ['49_heart_c', '55_hepatitis', '455_cars', '42_soybean', '31_credit_g', '1100_popularkids', '511_plasma_retinol', '1470_dresses_sales', '454_analcatdata_halloffame', '488_colleges_aaup']
     dataset_paths = [root_string.format(file) for file in files]
     print('\nrunning evaluation trials using datasets:\n', dataset_paths)
     print('\nand configs:\n', model_configs)
@@ -94,8 +95,8 @@ def main(
         for config, label in zip(model_configs, model_labels):
             # run trial using config
             trial_kwargs.update(config)
-            words = get_top_words(trial_kwargs)
-            rows.append({'dataset': dat_path, 'config': label, 'words': words})
+            words, metric = get_top_words(trial_kwargs)
+            rows.append({'dataset': dat_path, 'config': label, 'words': words, 'metric': metric})
             print(words)
             # trial_results = run_trial(trial_kwargs)            
 
@@ -105,9 +106,16 @@ def main(
             # rows.append(trial_results)
 
     # print('\n\nresults from evaluation trials:\n', rows, '\n\n')
+    previous_file = ""
     for row in rows:
-        print(row)
-        print("\n")
+        curr_file = row['dataset'].replace('/data/duke/data/LL0_','').replace('_dataset/tables/learningData.csv','').split('/')[0]
+        if curr_file == previous_file:
+            print("config: {0}, words: {1}".format(row['config'], row['words']))
+        else:
+            print("\n")
+            previous_file = row['dataset'].replace('/data/duke/data/LL0_','').replace('_dataset/tables/learningData.csv','').split('/')[0]
+            print("File:{0}, metric:{1}".format(curr_file, row['metric']))
+            print("config: {0}, words: {1}".format(row['config'], row['words']))
 
     df = pd.DataFrame(rows)
     df.to_csv('trials/trial_{0}.csv'.format(get_timestamp()), index=False)

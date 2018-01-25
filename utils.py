@@ -26,6 +26,9 @@ def unit_norm_rows(vectors):
 def mean_of_rows(vectors):
     return np.mean(vectors, axis=0)
 
+def max_of_rows(vectors):
+    return np.amax(vectors, axis=0)
+
 
 def in_vocab(word_list, model):
     if isinstance(word_list, str):

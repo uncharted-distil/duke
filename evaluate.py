@@ -12,6 +12,7 @@ from dataset import EmbeddedDataset
 from dataset_descriptor import DatasetDescriptor
 from embedding import Embedding
 from utils import get_timestamp, max_of_rows, mean_of_rows, path_to_name
+from agg_functions import null_tree_agg, maxabs_of_rows, maxabs
 
 
 def evaluate(scores, labels):
@@ -60,7 +61,7 @@ def run_experiment(
     embedding_path='embeddings/wiki2vec/en.model',
     dataset_paths=['data/185_baseball.csv'],
     model_configs=[{'row_agg_func': mean_of_rows, 'tree_agg_func': np.mean, 'source_agg_func': mean_of_rows}],
-    max_num_samples=1e6,
+    max_num_samples=int(1e5),
     verbose=True,
     ):
 
@@ -113,8 +114,10 @@ def run_experiment(
 def all_labeled_test():
 
     agg_func_combs = itertools.product(
-        [mean_of_rows, max_of_rows],  # row agg funcs
-        [np.mean, max],    # tree agg funcs
+        [mean_of_rows, max_of_rows],  # , maxabs_of_rows],  # row agg funcs
+        # [max_of_rows],  # row agg funcs
+        [np.mean, max, null_tree_agg],    # tree agg funcs
+        # [max_of_rows],   # source agg funcs
         [mean_of_rows, max_of_rows],   # source agg funcs
     )
 
@@ -176,20 +179,29 @@ def plot_results(trial_results=None, n_top=5):
     top_configs = config_strings[sort_inds][:n_top]
     print('\n\ntop {0} configs, scores:\n{1}\n\n'.format(
         n_top,
-        '\n'.join([str(x) for x in list(zip(top_configs, top_scores))])
+        '\n'.join([str(x) for x in zip(top_configs, top_scores)])
         ))
 
     print('plotting config scores\n')
-    fig = plt.figure(figsize=(14, 6))
-    grid = plt.GridSpec(1, 3)  # , hspace=0.2, wspace=0.2)
-    ax0 = fig.add_subplot(grid[0, 0])
-    ax1 = fig.add_subplot(grid[0, 1], sharey=ax0)
-    ax2 = fig.add_subplot(grid[0, 2], sharey=ax0)
 
-    sb.barplot(x='config', y='score_gap', data=df, ax=ax0)
-    sb.barplot(x='config', y='avg_positive_score', data=df, ax=ax1)
-    sb.barplot(x='config', y='-avg_negative_score', data=df, ax=ax2)
+    df.sort_values(by=['score_gap'], ascending=False, inplace=True)
 
+    sb.set(style="whitegrid")
+    fig, ax = plt.subplots(figsize=(15, 15))
+
+    order = config_strings[sort_inds]
+
+    sb.set_color_codes("pastel")
+    sb.barplot(x="score_gap", y="config", data=df, label="Score Gap", color="b", ci=None, order=order)
+
+    sb.set_color_codes("muted")
+    sb.barplot(x="avg_positive_score", y="config", data=df, label="Positive Score", color="b", ci=None, order=order)
+
+    # Add a legend and informative axis label
+    ax.legend(ncol=2, loc="lower right", frameon=True)
+    ax.set(ylabel="Model Config", xlabel="Average Score")
+    sb.despine(left=True, bottom=True)
+    
     plt.savefig('plots/scores_{0}.png'.format(get_timestamp()))
 
 

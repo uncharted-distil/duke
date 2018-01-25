@@ -18,7 +18,7 @@ class DatasetDescriptor():
         row_agg_func=mean_of_rows,
         tree_agg_func=np.mean,
         source_agg_func=mean_of_rows,
-        max_num_samples=1e6,
+        max_num_samples=int(1e5),
         verbose=False,
         ):
 

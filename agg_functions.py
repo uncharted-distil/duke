@@ -1,6 +1,15 @@
 import itertools
 import numpy as np
 
+def null_tree_agg(vector):
+    return vector[0]
+
+def maxabs_of_rows(vectors):
+    return np.max(np.abs(vectors), axis=0)
+
+def maxabs(vector):
+    return np.max(np.abs(vector))
+
 def null_prep(vector):
     return vector
 

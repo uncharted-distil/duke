@@ -44,7 +44,7 @@ def func_name_str(func):
     return func.__name__ if hasattr(func, '__name__') else str(func)
 
 
-# def run_trial(model_config=None, dataset=None, tree=None, embedding=None, verbose=True, max_num_samples=1e6):
+# def run_trial(model_config=None, dataset=None, tree=None, embedding=None, verbose=True, max_num_samples=int(1e5)):
 def run_trial(trial_kwargs):
     labels = trial_kwargs.pop('labels')
     duke = DatasetDescriptor(**trial_kwargs)
@@ -61,7 +61,7 @@ def main(
     embedding_path='models/word2vec/en_1000_no_stem/en.model',
     dataset_paths=['data/185_baseball.csv'],
     model_configs=[{'row_agg_func': mean_of_rows, 'tree_agg_func': np.mean, 'source_agg_func': mean_of_rows}],
-    max_num_samples=1e6,
+    max_num_samples=int(1e5),
     verbose=True,
     ):
 

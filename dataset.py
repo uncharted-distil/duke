@@ -7,7 +7,7 @@ from embedding import Embedding
 
 class EmbeddedDataset:
 
-    def __init__(self, embedding_model, dataset_path='data/185_baseball.csv', columns=None, max_num_samples=1e5, embed_dataset=True, verbose=False):
+    def __init__(self, embedding_model, dataset_path='data/baseball.csv', columns=None, max_num_samples=int(1e5), embed_dataset=True, verbose=False):
         
         self.data_vectors = {}
         self.max_num_samples=max_num_samples

@@ -14,7 +14,7 @@ def main(
     row_agg_func=mean_of_rows,
     tree_agg_func=parent_children_funcs(np.mean, max),
     source_agg_func=mean_of_rows,
-    max_num_samples = 1e6,
+    max_num_samples = int(1e5),
     verbose=True,
     ):
 

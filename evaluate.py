@@ -14,6 +14,7 @@ from embedding import Embedding
 from utils import get_timestamp, max_of_rows, mean_of_rows, path_to_name
 from agg_functions import null_tree_agg, maxabs_of_rows, maxabs, meanmax_tree_agg
 
+
 def check_args(scores, labels):
     scores = scores if isinstance(scores, np.ndarray) else np.array(scores)
     labels = labels if isinstance(labels, np.ndarray) else np.array(labels)
@@ -34,11 +35,11 @@ def evaluate(scores, labels, n_keep=None):
     pos_inds = np.where(labels == 1)[0]
     
     # compute pos match rate
-    # n_pos = len(pos_inds)
+    n_pos = len(pos_inds)
     n_keep = n_keep if n_keep else len(pos_inds)
     top_inds = np.argsort(scores)[::-1][:n_keep]
     n_matching = len(set.intersection(set(pos_inds), set(top_inds)))
-    results['positive_match_rate'] = n_matching / len(pos_inds)
+    results['positive_match_rate'] = n_matching / min(n_pos, n_keep)
     
     # average scores for negative and positive examples
     results['avg_positive_score'] = np.dot(scores[pos_inds], labels[pos_inds]) / len(pos_inds)
@@ -179,6 +180,11 @@ def plot_results(trial_results=None, n_keep=None):
     df['config'] = get_config_string_col(df)
     df['score_gap'] = df['avg_positive_score'] - df['avg_negative_score']
     df['-avg_negative_score'] = - df['avg_negative_score']
+    
+
+    df.groupby(['config', 'dataset'])
+
+
 
     config_score_map = df.groupby('config')['score_gap'].mean()     
     config_strings = np.array(list(config_score_map.keys()))
@@ -206,7 +212,6 @@ def plot_results(trial_results=None, n_keep=None):
     sb.set_color_codes("muted")
     sb.barplot(x="avg_positive_score", y="config", data=df, label="Positive Score", color="b", ci=None, order=order)
 
-    # Add a legend and informative axis label
     ax.legend(ncol=2, loc="lower right", frameon=True)
     ax.set(ylabel="Model Config", xlabel="Average Score")
     sb.despine(left=True, bottom=True)
@@ -227,6 +232,21 @@ def plot_results(trial_results=None, n_keep=None):
     sb.despine(left=True, bottom=True)
 
     plt.savefig('plots/positive_match_rate_keep{0}_{1}.png'.format(n_keep, get_timestamp()))
+
+    heatmap_data = df.groupby(['config', 'dataset'])['positive_match_rate'].mean()     
+    heatmap_data = heatmap_data.reset_index()
+    
+    heatmap_data = heatmap_data.pivot(columns='config', index='dataset', values='positive_match_rate')
+    heatmap_data = heatmap_data[order]  # reorder configs by average (across datasets) pos match rate
+    data_sort_inds = np.argsort(heatmap_data[order[0]])  # sort datasets by performance of best config on that dataset
+    heatmap_data = heatmap_data.reindex(heatmap_data.index[data_sort_inds])  
+
+    # heatmap_data = heatmap_data.pivot(index='config', columns='dataset', values='positive_match_rate')
+    # heatmap_data = heatmap_data.reindex(order)  
+    plt.clf()
+    sb.heatmap(heatmap_data, square=True)
+    plt.savefig('plots/heatmap_keep{0}_{1}.png'.format(n_keep, get_timestamp()))
+    
 
 
 if __name__ == '__main__':

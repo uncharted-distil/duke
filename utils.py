@@ -26,6 +26,9 @@ def unit_norm_rows(vectors):
 def mean_of_rows(vectors):
     return np.mean(vectors, axis=0)
 
+def max_of_rows(vectors):
+    return np.amax(vectors, axis=0)
+
 
 def max_of_rows(vectors):
     return np.max(vectors, axis=0)

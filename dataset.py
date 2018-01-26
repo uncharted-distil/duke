@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import pandas as pd
 from inflection import underscore
@@ -10,6 +11,7 @@ class EmbeddedDataset:
     def __init__(self, embedding_model, dataset_path='data/baseball.csv', columns=None, max_num_samples=int(1e5), embed_dataset=True, verbose=False):
         
         self.data_vectors = {}
+        self.metadata = {}
         self.max_num_samples=max_num_samples
         
         self.vprint = print if verbose else no_op
@@ -70,6 +72,21 @@ class EmbeddedDataset:
                 self.data[normalize_text(col, to_list=False)] = formatted_data
             else:
                 self.vprint('\nwarning: all rows removed by formatting (out of vocab?) in column', col, '\n')
+
+
+        unique_words = set()
+        for key in self.data:
+            for row in self.data[key]:
+                for term in row:
+                    unique_words.add(term)
+        num_terms = sum([len(self.data[key]) for key in self.data.keys()])
+        percent_unique = float(len(unique_words)) / float(num_terms)
+        self.metadata ={
+            'num_columns': len(self.data),
+            'num_terms': num_terms, 
+            'unique_terms': len(unique_words),
+            'percent_unique': percent_unique
+        }
 
         return self.data
 

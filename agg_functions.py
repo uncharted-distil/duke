@@ -1,6 +1,13 @@
 import itertools
 import numpy as np
 
+
+def meanmax_tree_agg(vector):
+    if len(vector) > 1:
+        return np.mean([vector[0], np.max(vector[1:])])
+    else: 
+        return vector[0]
+
 def null_tree_agg(vector):
     return vector[0]
 

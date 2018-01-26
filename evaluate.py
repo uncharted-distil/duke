@@ -12,10 +12,9 @@ from dataset import EmbeddedDataset
 from dataset_descriptor import DatasetDescriptor
 from embedding import Embedding
 from utils import get_timestamp, max_of_rows, mean_of_rows, path_to_name
-from agg_functions import null_tree_agg, maxabs_of_rows, maxabs
+from agg_functions import null_tree_agg, maxabs_of_rows, maxabs, meanmax_tree_agg
 
-
-def evaluate(scores, labels):
+def check_args(scores, labels):
     scores = scores if isinstance(scores, np.ndarray) else np.array(scores)
     labels = labels if isinstance(labels, np.ndarray) else np.array(labels)
 
@@ -24,9 +23,22 @@ def evaluate(scores, labels):
     assert min(labels) == -1
     assert len(labels) == len(scores)
 
+    return scores, labels
+
+
+def evaluate(scores, labels, n_keep=None):
+    scores, labels = check_args(scores, labels)
+
     results = {}
-    pos_inds = np.where(labels == 1)[0]
     neg_inds = np.where(labels == -1)[0]
+    pos_inds = np.where(labels == 1)[0]
+    
+    # compute pos match rate
+    # n_pos = len(pos_inds)
+    n_keep = n_keep if n_keep else len(pos_inds)
+    top_inds = np.argsort(scores)[::-1][:n_keep]
+    n_matching = len(set.intersection(set(pos_inds), set(top_inds)))
+    results['positive_match_rate'] = n_matching / len(pos_inds)
     
     # average scores for negative and positive examples
     results['avg_positive_score'] = np.dot(scores[pos_inds], labels[pos_inds]) / len(pos_inds)
@@ -50,10 +62,10 @@ def func_name_str(func):
     return func.__name__ if hasattr(func, '__name__') else str(func)
 
 
-def run_trial(trial_kwargs, labels):
+def run_trial(trial_kwargs, labels, n_keep=3):
     duke = DatasetDescriptor(**trial_kwargs)
     scores = duke.get_dataset_class_scores()
-    return evaluate(scores, labels)
+    return evaluate(scores, labels, n_keep=n_keep)
 
 
 def run_experiment(
@@ -62,6 +74,7 @@ def run_experiment(
     dataset_paths=['data/185_baseball.csv'],
     model_configs=[{'row_agg_func': mean_of_rows, 'tree_agg_func': np.mean, 'source_agg_func': mean_of_rows}],
     max_num_samples=int(1e5),
+    n_keep=30,
     verbose=True,
     ):
 
@@ -96,7 +109,7 @@ def run_experiment(
             print('\nrunning trial with config:', {key: func_name_str(val) for (key, val) in config.items()})
             # run trial using config
             trial_kwargs.update(config)
-            trial_results = run_trial(trial_kwargs, labels)            
+            trial_results = run_trial(trial_kwargs, labels, n_keep=n_keep)
 
             # add config and dataset name to results and append results to rows list
             trial_results.update({key: func_name_str(val) for (key, val) in config.items()})
@@ -111,32 +124,28 @@ def run_experiment(
     return df
     
 
-def all_labeled_test():
+def all_labeled_test(n_keep=7):
 
     agg_func_combs = itertools.product(
         [mean_of_rows, max_of_rows],  # , maxabs_of_rows],  # row agg funcs
-        # [max_of_rows],  # row agg funcs
-        [np.mean, max, null_tree_agg],    # tree agg funcs
-        # [max_of_rows],   # source agg funcs
+        [np.mean, max, meanmax_tree_agg],    # tree agg funcs
         [mean_of_rows, max_of_rows],   # source agg funcs
     )
 
     # create dict list of all func combinations
     model_configs = [{'row_agg_func': row, 'tree_agg_func': tree, 'source_agg_func': source} for (row, tree, source) in agg_func_combs]
-    ## manually set config list
-    # model_configs = [
-    #     {'row_agg_func': mean_of_rows, 'tree_agg_func': np.mean, 'source_agg_func': mean_of_rows},
-    # ]
 
+    # get all datasets with labels in the data/ directory
     dataset_paths = glob.glob('data/*_positive_examples.json')
     dataset_paths = [path.replace('_positive_examples.json', '.csv') for path in dataset_paths]
 
     df = run_experiment(
         dataset_paths=dataset_paths,
         model_configs=model_configs,
+        n_keep=n_keep,
         )
 
-    plot_results(df)
+    plot_results(df, n_keep)
     
 
 def config_to_legend_string(config):
@@ -152,7 +161,7 @@ def get_config_string_col(df):
             ) for index, row in df.iterrows()]
 
 
-def plot_results(trial_results=None, n_top=5):
+def plot_results(trial_results=None, n_keep=None):
 
     if trial_results is None:
         files = glob.glob('trials/*.csv')
@@ -175,12 +184,12 @@ def plot_results(trial_results=None, n_top=5):
     config_strings = np.array(list(config_score_map.keys()))
     config_scores = config_score_map.values
     sort_inds = np.argsort(config_scores)[::-1]
-    top_scores = config_scores[sort_inds][:n_top]
-    top_configs = config_strings[sort_inds][:n_top]
-    print('\n\ntop {0} configs, scores:\n{1}\n\n'.format(
-        n_top,
-        '\n'.join([str(x) for x in zip(top_configs, top_scores)])
-        ))
+    # top_scores = config_scores[sort_inds][:n_top]
+    # top_configs = config_strings[sort_inds][:n_top]
+    # print('\n\ntop {0} configs, scores:\n{1}\n\n'.format(
+    #     n_top,
+    #     '\n'.join([str(x) for x in zip(top_configs, top_scores)])
+    #     ))
 
     print('plotting config scores\n')
 
@@ -202,7 +211,22 @@ def plot_results(trial_results=None, n_top=5):
     ax.set(ylabel="Model Config", xlabel="Average Score")
     sb.despine(left=True, bottom=True)
     
-    plt.savefig('plots/scores_{0}.png'.format(get_timestamp()))
+    plt.savefig('plots/score_gap_{0}.png'.format(get_timestamp()))
+
+    plt.clf()
+
+    config_score_map = df.groupby('config')['positive_match_rate'].mean()     
+    config_strings = np.array(list(config_score_map.keys()))
+    config_scores = config_score_map.values
+    sort_inds = np.argsort(config_scores)[::-1]
+    order = config_strings[sort_inds]
+    fig, ax = plt.subplots(figsize=(15, 15))
+    sb.barplot(x="positive_match_rate", y="config", data=df, label="Positive Match Rate (keep {0})".format(n_keep), color="b", ci=None, order=order)    
+    ax.legend(ncol=2, loc="lower right", frameon=True)
+    ax.set(ylabel="Model Config", xlabel="Positive Match Rate (keep {0})".format(n_keep))
+    sb.despine(left=True, bottom=True)
+
+    plt.savefig('plots/positive_match_rate_keep{0}_{1}.png'.format(n_keep, get_timestamp()))
 
 
 if __name__ == '__main__':

@@ -12,7 +12,7 @@ import collections
 
 import cProfile as profile
 
-
+from agg_functions import parent_children_funcs
 from dataset_description import DatasetDescriptor
 from similarity_functions import w2v_similarity
 
@@ -35,7 +35,7 @@ class DukeRestListener:
             embedding_path='en_1000_no_stem/en.model'  # wiki2vec model
             ontology_path='dbpedia_2016-10'
             similarity_func=w2v_similarity
-            tree_agg_func=np.mean
+            tree_agg_func=parent_children_funcs(np.mean, max)
             source_agg_func=lambda scores: np.mean(scores, axis=0),
             max_num_samples = 2000
             verbose=True

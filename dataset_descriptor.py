@@ -71,6 +71,18 @@ class DatasetDescriptor():
         sources = self.sources
         self.stddev = np.mean([np.mean(np.std(self.similarity_matrices[src], axis=0)) for src in sources])
 
+        # stacked_similarity = None
+        # for src in sources:
+        #     print(np.shape(stacked_similarity))
+        #     print(np.shape(self.similarity_matrices[src]))
+        #     if stacked_similarity is None:
+        #         stacked_similarity = self.similarity_matrices[src]
+        #     else:
+        #         stacked_similarity = np.append(stacked_similarity, self.similarity_matrices[src], axis=1)
+        # self.total_stddev = np.mean(np.std(stacked_similarity, axis=0))
+
+        self.dataset.metadata['deviation_percentage'] = self.stddev / self.dataset.metadata['percent_unique']
+
         self.vprint('aggregating row scores')
         sim_scores = {src: self.row_agg_func(self.similarity_matrices[src], self.stddev) for src in sources}
         

@@ -190,13 +190,13 @@ def plot_results(trial_results=None, n_keep=None):
     image_path = 'plots/barplot_score_gap_{0}.png'.format(get_timestamp())
     plot_horizontal_barplot(df, image_path=image_path, group_by='config', values=['score_gap', 'avg_positive_score'], colors=['b','g'])
 
-    image_path = 'plots/barplot_positive_match_rate{0}_{1}.png'.format('_keep' + n_keep if n_keep else '', get_timestamp())
+    image_path = 'plots/barplot_positive_match_rate{0}_{1}.png'.format('_keep' + str(n_keep) if n_keep else '', get_timestamp())
     plot_horizontal_barplot(df, image_path=image_path, group_by='config', values='positive_match_rate')
 
-    image_path = 'plots/heatmap_positive_match_rate{0}_{1}.png'.format('_keep' + n_keep if n_keep else '', get_timestamp())
+    image_path = 'plots/heatmap_positive_match_rate{0}_{1}.png'.format('_keep' + str(n_keep) if n_keep else '', get_timestamp())
     plot_heatmap(df, image_path=image_path, columns='config', index='dataset', values='positive_match_rate')
     
 
 if __name__ == '__main__':
-    # all_labeled_test()
-    plot_results()
+    all_labeled_test()
+    # plot_results()

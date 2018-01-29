@@ -90,14 +90,14 @@ class DatasetDescriptor():
             sim_scores = {src: self.row_agg_func(self.similarity_matrices[src], self.stddev) for src in sources}
         else:
             sim_scores = {src: self.row_agg_func(self.similarity_matrices[src]) for src in sources}
-
         
         self.vprint('aggregating tree scores')
         tree_scores = {src: self.aggregate_tree_scores(sim_scores[src]) for src in sources}
         
         self.vprint('aggregating source scores')
-        return self.aggregate_source_scores(tree_scores), self.stddev
+        return self.aggregate_source_scores(tree_scores)
     
+
     def get_dataset_description(self):
         final_scores = self.get_dataset_class_scores()
         top_word = self.tree.classes[np.argmax(final_scores)]

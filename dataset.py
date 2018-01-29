@@ -23,6 +23,7 @@ class EmbeddedDataset:
         self.load_dataset(dataset_path, columns=columns)  
         
         if embed_dataset:
+            # compute self.data_vectors
             self.embed_dataset()
         
 

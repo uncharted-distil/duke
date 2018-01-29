@@ -1,4 +1,5 @@
 import numpy as np
+from inspect import signature
 from operator import itemgetter
 from inflection import pluralize
 
@@ -84,7 +85,12 @@ class DatasetDescriptor():
         self.dataset.metadata['deviation_percentage'] = self.stddev / self.dataset.metadata['percent_unique']
 
         self.vprint('aggregating row scores')
-        sim_scores = {src: self.row_agg_func(self.similarity_matrices[src], self.stddev) for src in sources}
+        num_params = len(signature(self.row_agg_func).parameters)
+        if num_params > 1:
+            sim_scores = {src: self.row_agg_func(self.similarity_matrices[src], self.stddev) for src in sources}
+        else:
+            sim_scores = {src: self.row_agg_func(self.similarity_matrices[src]) for src in sources}
+
         
         self.vprint('aggregating tree scores')
         tree_scores = {src: self.aggregate_tree_scores(sim_scores[src]) for src in sources}
@@ -121,7 +127,12 @@ class DatasetDescriptor():
 
 
     def aggregate_source_scores(self, scores):
+
         assert len(scores) == len(self.sources)
         if isinstance(scores, dict):
             scores = list(scores.values())                
-        return self.source_agg_func(scores, self.stddev)
+        num_params = len(signature(self.source_agg_func).parameters)
+        if num_params > 1:
+            return self.source_agg_func(scores, self.stddev)
+        else:
+            return self.source_agg_func(scores)

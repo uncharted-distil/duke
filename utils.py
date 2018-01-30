@@ -44,7 +44,7 @@ def get_dropped(old, new):
         return set(old).difference(set(new))        
 
 
-def no_op():
+def no_op(*args, **kwargs):
     return None
 
 

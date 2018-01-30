@@ -5,7 +5,7 @@ import numpy as np
 
 class Embedding:
     def __init__(self, 
-        embedding_path='embeddings/wiki2vec.model',
+        embedding_path='embeddings/wiki2vec/en.model',
         embed_agg_func= mean_of_rows,
         verbose=False):
         ''' Load a word2vec embedding from a file '''

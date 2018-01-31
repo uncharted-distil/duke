@@ -9,6 +9,8 @@ ontologies/*.owl
 *.csv
 *.json
 *.zip
+*.npy
+*.npz
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

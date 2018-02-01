@@ -6,7 +6,7 @@ decoder = JSONDecoder()
 
 test_file_name = '185_baseball' #185_baseball, 26_radon_seed, 30_personae, 196_autoMpg, 313_spectrometer etc
 
-filename = "darpa_data/seeds/"+test_file_name+"/"+test_file_name+"_dataset/tables/learningData.csv"
+filename = "data/"+test_file_name+".csv"
 
 print("DEBUG::chkpt0")
 print(filename)

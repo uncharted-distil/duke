@@ -8,7 +8,7 @@ from utils import mean_of_rows
 
 
 def main(
-    dataset_path='data/baseball.csv',
+    dataset_path='data/185_baseball.csv',
     tree_path='ontologies/class-tree_dbpedia_2016-10.json',
     embedding_path='embeddings/wiki2vec/en.model',
     row_agg_func=mean_of_rows,

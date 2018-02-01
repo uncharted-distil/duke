@@ -36,7 +36,7 @@ def scrape_ddw(user='craig-corcoran', project='dataset-labeling'):
         tags[key] = ds_content['tags']
 
         with open('data/ddw/{0}_tags.json'.format(file_key), 'w') as json_file:
-            json.dump(ds_content['tags'], json_file)
+            json.dump(ds_content['tags'], json_file, indent=2)
 
         # get table names
         table_query = 'SELECT * FROM Tables'
@@ -112,7 +112,7 @@ def read_s3(base_dir='data/ddw-s3', bucket_name='dataworld-newknowledge-us-east-
                     print('content:', content)
                 else:
                     with open(tags_fname, 'w') as json_file:
-                        json.dump(content['tags'], json_file)
+                        json.dump(content['tags'], json_file, indent=2)
 
             except Exception as e:
                 print('error with tags in:', tags_fname)
@@ -160,7 +160,7 @@ def get_tags_filename(folder, data_id):
     return '{0}/{1}_tags.json'.format(folder, data_id)
 
 
-def get_all_tags(base_dir='data/ddw-s3', n_tags=1000):
+def get_all_tags(base_dir='data/ddw-s3/labeled', n_tags=1000):
 
     directories = glob.glob('{0}/*'.format(base_dir))
     all_tags = set()
@@ -200,7 +200,7 @@ def get_all_tags(base_dir='data/ddw-s3', n_tags=1000):
     dict_path = '{0}/tags_dict.json'.format(base_dir)
     with open(dict_path, 'w') as json_file:
         print('writing all tags to file')
-        json.dump(tags_dict, json_file)
+        json.dump(tags_dict, json_file, indent=2)
     
 
 def build_target_matrix(base_dir='data/ddw-s3'):
@@ -253,9 +253,9 @@ def build_target_matrix(base_dir='data/ddw-s3'):
 if __name__ == '__main__':
     # main()
     # read_s3()
-    # get_all_tags()
+    get_all_tags()
     # build_target_matrix()
-    move_labeled()
+    # move_labeled()
 
     # Access key ID,
     # Secret access key

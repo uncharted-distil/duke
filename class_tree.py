@@ -155,7 +155,7 @@ def generate_class_tree_file(ontology_path = 'ontologies/dbpedia_2016-10.nt', pr
     ontology_name = path_to_name(ontology_path)
     file_name = 'ontologies/class-tree_{0}{1}.json'.format(ontology_name, '_pruned' if prune else '')
     with open(file_name, 'w') as rels_file:
-        json.dump(relationships, rels_file, indent=4)
+        json.dump(relationships, rels_file, indent=2)
 
 
 if __name__ == '__main__':

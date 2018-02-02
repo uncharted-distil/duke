@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import pandas as pd
 from inflection import underscore
@@ -78,14 +79,20 @@ class EmbeddedDataset:
         # compute data embedding for all sources in data
         for src, word_lol in data.items():
             self.vprint('computing data embedding for data from:', src)
+            try:
+                if self.max_num_samples and len(word_lol) > self.max_num_samples:
+                    self.vprint('subsampling rows from length {0} to {1}'.format(len(word_lol), self.max_num_samples))
+                    np.random.shuffle(word_lol)  # TODO minibatches rather than truncate / subsample?
+                    word_lol = word_lol[:self.max_num_samples]
 
-            if self.max_num_samples and len(word_lol) > self.max_num_samples:
-                self.vprint('subsampling rows from length {0} to {1}'.format(len(word_lol), self.max_num_samples))
-                np.random.shuffle(word_lol)  # TODO minibatches rather than truncate / subsample?
-                word_lol = word_lol[:self.max_num_samples]
+                dat_vecs = np.array([self.embedding.embed_multi_words(words) for words in word_lol])  # matrix of w/ len(data[src]) rows and n_emb_dim columns
+                if len(dat_vecs) == 0:
+                    continue
+                dat_vecs = unit_norm_rows(dat_vecs)
+            except:
+                print(sys.exc_info())
+                continue
 
-            dat_vecs = np.array([self.embedding.embed_multi_words(words) for words in word_lol])  # matrix of w/ len(data[src]) rows and n_emb_dim columns
-            dat_vecs = unit_norm_rows(dat_vecs)
             if reset_scores or not self.data_vectors.get(src):
                 self.data_vectors[src] = dat_vecs
             else:

@@ -8,13 +8,11 @@ Untar it in the top-level folder of this project
 
 Second, go to https://datadrivendiscovery.org/data/seed_datasets_current/, download the dataset you want and put it in the darpa_data/seeds subfolder
 
-Change macro settings on Ln 72 to 78 of main.py according to what you want to analyze (name of dataset, column name, look at headers instead? etc.). The code should be documented sufficiently to be easily understood.
-
-Third, make sure to use python 2.7 (for now) and be sure to get gensim installed via `pip2 install gensim`
+Third, make sure to use python 3.5+ and be sure to get gensim installed via `pip3 install gensim`
 
 Finally, run it as follows, and enjoy the magic... 
 
 ```bash
-python2 main.py
+python3 main.py
 ```
 

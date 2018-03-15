@@ -4,13 +4,13 @@ First, you should download wiki2vec model (English Wikipedia) using a torrent as
 
 https://github.com/idio/wiki2vec
 
-Untar it in the top-level folder of this project
+Untar it at a preferred location and note it. Open main.py and modify embedding_path variable to the aforementioned location.
 
-Second, go to https://datadrivendiscovery.org/data/seed_datasets_current/, download the dataset you want and put it in the darpa_data/seeds subfolder
+Using python3.5+, pip3 install required libraries in requirements.txt. 
 
-Third, make sure to use python 3.5+ and be sure to get gensim installed via `pip3 install gensim`
+Identify a dataset of interest, and specify its path in main.py.
 
-Finally, run it as follows, and enjoy the magic... 
+Finally, run it as follows, and enjoy the magic...
 
 ```bash
 python3 main.py

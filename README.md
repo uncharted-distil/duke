@@ -14,3 +14,4 @@
 python3 main.py
 ```
 
+Note: you may pip install Duke via git+https://github.com/NewKnowledge/duke

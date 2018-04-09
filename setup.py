@@ -1,9 +1,9 @@
 from distutils.core import setup
 
-setup(name='Simon',
+setup(name='Duke',
     version='1.1.0',
     description='Character-level CNN+LSTM model for text classification',
-    packages=['Simon'],
+    packages=['Duke'],
     install_requires=['Faker >= 0.7.7',
         'scikit-learn >= 0.18.1',
         'python-dateutil >= 2.5.3',

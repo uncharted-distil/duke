@@ -2,8 +2,8 @@ import sys
 import numpy as np
 import pandas as pd
 from inflection import underscore
-from utils import no_op, normalize_text, get_dropped, unit_norm_rows
-from embedding import Embedding
+from Duke.utils import no_op, normalize_text, get_dropped, unit_norm_rows
+from Duke.embedding import Embedding
 
 
 class EmbeddedDataset:

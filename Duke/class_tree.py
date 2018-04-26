@@ -11,7 +11,7 @@ from Duke.utils import DASHES_TO_SPACES, REMOVE_PAREN, unit_norm_rows, no_op, pa
 
 class EmbeddedClassTree():
 
-    def __init__(self, embedding_model, tree_path='ontologies/class-tree_dbpedia_2016-10.json', embed_classes=True, verbose=False):
+    def __init__(self, embedding_model, tree_path=os.path.join(os.path.dirname(__file__),'class-tree_dbpedia_2016-10.json'), embed_classes=True, verbose=False):
         self.vprint = print if verbose else no_op
 
         assert isinstance(embedding_model, Embedding)

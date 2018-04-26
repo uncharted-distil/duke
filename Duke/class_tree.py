@@ -5,8 +5,8 @@ import numpy as np
 import ontospy
 from inflection import underscore
 
-from embedding import Embedding
-from utils import DASHES_TO_SPACES, REMOVE_PAREN, unit_norm_rows, no_op, path_to_name
+from Duke.embedding import Embedding
+from Duke.utils import DASHES_TO_SPACES, REMOVE_PAREN, unit_norm_rows, no_op, path_to_name
 
 
 class EmbeddedClassTree():

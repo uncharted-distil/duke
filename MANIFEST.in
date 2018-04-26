@@ -1,0 +1,2 @@
+include Duke/ontologies/class-tree_dbpedia_2016-10.json
+include Duke/ontologies/class-tree_dbpedia_2016-10_pruned.json

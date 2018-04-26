@@ -1,6 +1,3 @@
-import cProfile as profile
-import sys
-
 import numpy as np
 from Duke.agg_functions import *
 from Duke.dataset_descriptor import DatasetDescriptor
@@ -36,5 +33,3 @@ def main(
 
 if __name__ == '__main__':
     main()
-    # profile.run('main()', sort='time')
-    # main(dataset=sys.argv[1], embedding_path=sys.argv[2])

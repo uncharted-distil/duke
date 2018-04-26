@@ -2,10 +2,10 @@ import numpy as np
 from operator import itemgetter
 from inflection import pluralize
 
-from class_tree import EmbeddedClassTree, tree_score
-from dataset import EmbeddedDataset
-from embedding import Embedding
-from utils import mean_of_rows, no_op
+from Duke.class_tree import EmbeddedClassTree, tree_score
+from Duke.dataset import EmbeddedDataset
+from Duke.embedding import Embedding
+from Duke.utils import mean_of_rows, no_op
 
 
 class DatasetDescriptor():

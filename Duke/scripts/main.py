@@ -2,9 +2,9 @@ import cProfile as profile
 import sys
 
 import numpy as np
-from agg_functions import *
-from dataset_descriptor import DatasetDescriptor
-from utils import mean_of_rows
+from Duke.agg_functions import *
+from Duke.dataset_descriptor import DatasetDescriptor
+from Duke.utils import mean_of_rows
 
 
 def main(

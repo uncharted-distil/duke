@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name='Duke',
-    version='1.1.0',
+    version='1.2.0',
     description='Tabular Dataset Summarization System',
     packages=['Duke'],
     install_requires=['Faker >= 0.7.7',

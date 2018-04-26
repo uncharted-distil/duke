@@ -4,8 +4,8 @@ data/*.json
 embeddings
 trials
 plots
-ontologies/*.nt
-ontologies/*.owl
+#ontologies/*.nt
+#ontologies/*.owl
 *.csv
 *.json
 *.zip

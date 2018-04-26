@@ -1,5 +1,5 @@
 from gensim.models import Word2Vec
-from utils import mean_of_rows, no_op
+from Duke.utils import mean_of_rows, no_op
 import numpy as np
 
 

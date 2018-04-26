@@ -1,4 +1,4 @@
-from Duke.Duke import Duke
+import Duke
 
 __version__ = '1.2.0'
 

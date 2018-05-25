@@ -1,7 +1,7 @@
 import requests
 from json import JSONDecoder
 
-address = "http://localhost:5001"
+address = "http://localhost:5003"
 decoder = JSONDecoder()
 
 test_file_name = '185_baseball' #185_baseball, 26_radon_seed, 30_personae, 196_autoMpg, 313_spectrometer etc

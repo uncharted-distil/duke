@@ -54,12 +54,16 @@ class DukeRestListener:
             print('initialized duke dataset descriptor \n')
 
             description = duke.get_dataset_description()
-
             print(description)
+
+            N = 5
+            out = duke.get_top_n_words(N)
+            print("The top N=%d words are"%N)
+            print(out)
 
             print("The whole script took %f seconds to execute"%(time.time()-start))
 
-            return self.encoder.encode(description)
+            return self.encoder.encode(out)
 
 
 config = configparser.ConfigParser()

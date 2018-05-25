@@ -94,7 +94,7 @@ class DatasetDescriptor():
         indexed_scores = sorted(indexed_scores, key=itemgetter(0), reverse=True)
         top_n = indexed_scores[0:n]
         top_words = [self.tree.classes[index] for (score, index) in top_n]
-        return top_words
+        return top_words, [x[0] for x in top_n]
 
     def aggregate_tree_scores(self, scores):
         # convert score to dict that maps class to score if needed

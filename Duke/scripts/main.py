@@ -28,6 +28,11 @@ def main(
 
     print('initialized duke dataset descriptor \n')
 
+    out = duke.get_top_n_words(10)
+    print("The top N=%d words are"%10)
+    print(out)
+
+
     return duke.get_dataset_description()
 
 

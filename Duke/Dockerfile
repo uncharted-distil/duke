@@ -46,6 +46,8 @@ RUN pip3 --no-cache-dir install \
         && \
     python3 -m ipykernel.kernelspec
     
+RUN pip3 install git+https://github.com/NewKnowledge/duke
+    
 # matplotlib config (used by benchmark)
 RUN mkdir -p /root/.config/matplotlib
 RUN echo "backend : Agg" > /root/.config/matplotlib/matplotlibrc

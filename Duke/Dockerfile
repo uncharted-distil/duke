@@ -30,12 +30,9 @@ RUN pip3 --no-cache-dir install \
         jupyter \
         matplotlib \
         numpy \
-        scipy \
         sklearn \
         pandas \
         Pillow \
-        faker \
-        h5py \
         azure-datalake-store \
         typing \
         gensim \
@@ -58,9 +55,6 @@ RUN echo "backend : Agg" > /root/.config/matplotlib/matplotlibrc
 # RUN pip --no-cache-dir install /_PIP_FILE_
 # RUN rm -f /_PIP_FILE_
 
-# Install TensorFlow GPU version.
-#RUN pip3 --no-cache-dir install \
-#    https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.2.1-cp35-cp35m-linux_x86_64.whl
 # --- ~ DO NOT EDIT OR DELETE BETWEEN THE LINES --- #
 
 # RUN ln -s /usr/bin/python3 /usr/bin/python#

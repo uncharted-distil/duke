@@ -5,9 +5,9 @@ from Duke.utils import mean_of_rows
 
 
 def main(
-    dataset_path='/data/home/jgleason/D3m/datasets/seed_datasets_current/185_baseball.csv',
+    dataset_path='/data/home/jgleason/D3m/datasets/seed_datasets_current/185_baseball/TRAIN/dataset_TRAIN/tables/learningData.csv',
     tree_path='../ontologies/class-tree_dbpedia_2016-10.json',
-    embedding_path='/data/home/jgleason/Downloads/enwiki-gensim-word2vec-1000-nostem-10cbow.torrent',
+    embedding_path='/data/home/jgleason/Downloads/en_1000_no_stem/en.model',
     row_agg_func=mean_of_rows,
     tree_agg_func=parent_children_funcs(np.mean, max),
     source_agg_func=mean_of_rows,

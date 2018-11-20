@@ -1,6 +1,7 @@
 # duke -- Dataset Understanding via Knowledge-base Embeddings
 
-1. First, you should download wiki2vec model (English Wikipedia) using a torrent as described on this link: https://github.com/idio/wiki2vec -- untar it at a preferred location and note it. 
+1. First, you should download wiki2vec model (English Wikipedia) from the public 
+Data Driven Discovery repository public.datadrivendiscovery.org -- untar it at a preferred location and note it. 
 
 2. Clone this repository, open main.py in scripts/ subdirectory and modify embedding_path variable to the aforementioned wiki2vec model location.
 
